@@ -24,16 +24,13 @@
   </header>
 
   <main class="container">
-    <!-- Chips/grilla de músculos -->
     <section id="muscleGrid" class="muscle-grid"></section>
 
-    <!-- Controles -->
     <section class="controls">
       <button id="openFilters" class="btn soft">🎚️ Filtros</button>
       <button id="generate" class="btn primary">⚡ Generar rutina</button>
     </section>
 
-    <!-- Contenido dinámico -->
     <section id="content"></section>
   </main>
 
@@ -47,6 +44,8 @@
   <div id="modalConfig" class="modal hidden" role="dialog" aria-modal="true"></div>
   <div id="modalMedia" class="modal hidden" role="dialog" aria-modal="true"></div>
 
-  <script type="module" src="./app.js"></script>
+  <!-- Importa PRIMERO ejercicios, LUEGO app -->
+  <script defer src="./ejercicios.js"></script>
+  <script defer src="./app.js"></script>
 </body>
 </html>
