@@ -1,47 +1,52 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rutinas en casa • Web</title>
-<link rel="stylesheet" href="styles.css?v=4">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Rutinas en casa • Web</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🏋️</span>
       <div>
         <h1 id="appTitle">Rutinas en casa</h1>
-        <p class="sub" id="subtitle"></p>
+        <p id="subtitle" class="muted">Elige un músculo o usa Cuerpo completo</p>
       </div>
-      <nav class="toolbar">
-        <button id="btnFavorites" class="nav-btn">❤️ <span data-i="favorites">Favoritos</span></button>
-        <button id="btnFilters" class="nav-btn">🎚️ <span data-i="filters">Filtros</span></button>
-        <button id="btnSettings" class="nav-btn">⚙️ <span data-i="settings">Ajustes</span></button>
-      </nav>
-    </header>
-
-    <div class="chips" id="muscleChips"></div>
-
-    <div class="controls">
-      <button class="btn secondary" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
-      <button class="btn primary" id="generate" disabled>⚡ <span data-i="generate">Generar</span></button>
     </div>
+    <nav class="actions">
+      <button id="btnFavorites" class="ghost">❤️ Favoritos</button>
+      <button id="btnFilters" class="ghost">🎚️ Filtros</button>
+      <button id="btnSettings" class="ghost">⚙️ Ajustes</button>
+    </nav>
+  </header>
 
-    <main id="content"></main>
-  </div>
+  <main class="container">
+    <!-- Chips/grilla de músculos -->
+    <section id="muscleGrid" class="muscle-grid"></section>
 
-  <!-- Overlay + Bottom Sheet -->
-  <div id="overlay" class="overlay" hidden></div>
-  <aside id="sheet" class="sheet" aria-hidden="true">
-    <div class="sheet-handle"></div>
-    <header class="sheet-header">
-      <h2 id="sheetTitle"></h2>
-      <button id="sheetClose" class="icon-btn" aria-label="Cerrar">✖</button>
-    </header>
-    <section id="sheetBody" class="sheet-body"></section>
-    <div class="sheet-safe"></div>
-  </aside>
+    <!-- Controles -->
+    <section class="controls">
+      <button id="openFilters" class="btn soft">🎚️ Filtros</button>
+      <button id="generate" class="btn primary">⚡ Generar rutina</button>
+    </section>
 
-  <script defer src="app.js?v=4"></script>
+    <!-- Contenido dinámico -->
+    <section id="content"></section>
+  </main>
+
+  <!-- Overlays / Modales -->
+  <div id="overlay" class="overlay hidden"></div>
+
+  <div id="modalFilters" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="modalFavorites" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="modalSettings" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="modalPicker" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="modalConfig" class="modal hidden" role="dialog" aria-modal="true"></div>
+  <div id="modalMedia" class="modal hidden" role="dialog" aria-modal="true"></div>
+
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
