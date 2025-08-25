@@ -1,4 +1,4 @@
-// app.js correr
+// app.js
 import { EXERCISES } from "./ejercicios.js";
 
 /* ========= Estado ========= */
