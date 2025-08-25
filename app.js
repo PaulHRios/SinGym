@@ -31,28 +31,27 @@ const I18N = {
     mediaURL:"Media URL (optional)", save:"Save", cancel:"Cancel", setsRepsRest:"Sets / Reps / Rest",
     feedback:"Feedback", name:"Name", email:"Email", message:"Message", send:"Send",
     thanksFeedback:"Thanks for your feedback.",
-    supportDev:"Support the developer", tipJar:"Tip Jar ☕️", loading:"Loading…", custom:"Custom",
+    supportDev:"Support the developer", tip Jar:"Tip Jar ☕️", loading:"Loading…", custom:"Custom",
     all:"All", use:"Use", editTime:"Edit time", max1000:"Max 10:00"
   }
 };
-// por defecto español
+// default español
 const Lang = {
   key:"app_lang_v1",
   get(){ const raw=localStorage.getItem(this.key)||"es"; return raw==="system" ? ((navigator.language||"en").toLowerCase().startsWith("es")?"es":"en") : raw; },
   set(v){ localStorage.setItem(this.key,v); }
 };
 let L = I18N[Lang.get()];
-function t(k){ return (L[k] ?? k); }
-function applyStaticI18n(){ document.querySelectorAll("[data-i]").forEach(n => n.textContent = t(n.dataset.i)); }
-const $ = sel => document.querySelector(sel);
+const t = k => L[k] ?? k;
+const $ = s => document.querySelector(s);
 
-/* ===================== Domain ===================== */
+function applyStaticI18n(){ document.querySelectorAll("[data-i]").forEach(n => n.textContent = t(n.dataset.i)); }
+
+/* ===================== Domain & Storage ===================== */
 const Env = { home:"home", gym:"gym" };
 const Equip = { bodyweight:"bodyweight", dumbbells:"dumbbells", kettlebell:"kettlebell", barbell:"barbell", bench:"bench", bands:"bands", cable:"cable", machine:"machine", smith:"smith" };
 const Muscles = ["chest","back","quads","hamstrings","glutes","shoulders","biceps","triceps","calves","core"];
-const Pattern = { horizontalPush:"horizontalPush", verticalPush:"verticalPush", horizontalPull:"horizontalPull", verticalPull:"verticalPull",
-  kneeDominant:"kneeDominant", hipHinge:"hipHinge", elbowFlexion:"elbowFlexion", elbowExtension:"elbowExtension",
-  abAntiExtension:"abAntiExtension", abAntiRotation:"abAntiRotation", abFlexion:"abFlexion", abLateralFlexion:"abLateralFlexion", calfRaise:"calfRaise" };
+const Pattern = { horizontalPush:"horizontalPush", verticalPush:"verticalPush", horizontalPull:"horizontalPull", verticalPull:"verticalPull", kneeDominant:"kneeDominant", hipHinge:"hipHinge", elbowFlexion:"elbowFlexion", elbowExtension:"elbowExtension", abAntiExtension:"abAntiExtension", abAntiRotation:"abAntiRotation", abFlexion:"abFlexion", abLateralFlexion:"abLateralFlexion", calfRaise:"calfRaise" };
 const Goal = { strength:"strength", hypertrophy:"hypertrophy", fatLoss:"fatLoss", maintenance:"maintenance" };
 
 function mTitle(m){
@@ -66,17 +65,16 @@ function equipTitle(e){
   return (Lang.get()==="es"?es:en)[e] || e;
 }
 
-/* ===================== Storage ===================== */
 const Storage = {
   get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
   set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 };
 const CustomStoreKey = "custom_exercises_v1";
 const FavoriteKey = "favorite_plans_v2";
-const CustomStore = { list(){ return Storage.get(CustomStoreKey,[]); }, add(ex){const a=this.list(); a.unshift(ex); Storage.set(CustomStoreKey,a);} };
-const Favorites = { list(){ return Storage.get(FavoriteKey,[]); }, add(p){ const a=this.list(); a.unshift(p); Storage.set(FavoriteKey,a); }, removeAt(i){ const a=this.list(); a.splice(i,1); Storage.set(FavoriteKey,a);} };
+const CustomStore = { list(){ return Storage.get(CustomStoreKey,[]); }, add(ex){ const a=this.list(); a.unshift(ex); Storage.set(CustomStoreKey,a); } };
+const Favorites = { list(){ return Storage.get(FavoriteKey,[]); }, add(p){ const a=this.list(); a.unshift(p); Storage.set(FavoriteKey,a); }, removeAt(i){ const a=this.list(); a.splice(i,1); Storage.set(FavoriteKey,a); } };
 
-/* ===================== Defaults ===================== */
+/* ===================== VM defaults ===================== */
 const TrainingDefaults = {
   targetExercises(d, fb){ if(d<30) return fb?3:2; if(d<45) return fb?4:3; if(d<60) return fb?5:4; if(d<90) return fb?6:5; return fb?6:6; },
   sets(goal,d){ switch(goal){ case Goal.strength: return d<40?3:4; case Goal.hypertrophy: return d<40?3:4; case Goal.fatLoss: return 3; case Goal.maintenance: return 3; } },
@@ -84,80 +82,58 @@ const TrainingDefaults = {
   rest(goal){ switch(goal){ case Goal.strength: return 120; case Goal.hypertrophy: return 90; case Goal.fatLoss: return 60; case Goal.maintenance: return 75; } }
 };
 
-// Estado VM (con tus defaults pedidos)
-let EXERCISES = []; // ejercicios base + custom
+let EXERCISES = []; // exercises.json + custom
 let Filters = {
   environment: Env.home,
-  // Todo activo MENOS poleas/cable, máquina y smith:
-  allowedEquipment: new Set(Object.values(Equip).filter(e => !["cable","machine","smith"].includes(e))),
+  allowedEquipment: new Set(Object.values(Equip).filter(e => !["cable","machine","smith"].includes(e))), // todo salvo poleas/máq/smith
   minutes: 30,
-  preferBeginner: false, // principiantes APAGADO
+  preferBeginner: false, // principiantes OFF
   goal: Goal.hypertrophy,
   fullBody: false
 };
 let selectedMuscle = null;
 let currentPlan = null;
 
-/* ===================== Helpers ===================== */
+/* ===================== Utils ===================== */
 const makeId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
-const el = html => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
-const showModal = id => { $("#backdrop").classList.add("show"); $("#"+id).classList.add("show"); };
-const closeModals = () => { $("#backdrop").classList.remove("show"); document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show")); };
-$("#backdrop").onclick = closeModals;
 const shuffle = a => { const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]];} return x; };
 const norm = s => (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 
-/* ===================== Exercise Library (subset + fetch externo) ===================== */
-function addEx(list, n,m,p,eq,env,uni,beg,ins,v,media=null){
-  list.push({id:makeId(), name:n, muscle:m, patterns:p, equipment:eq, environment:env, unilateral:uni, beginnerFriendly:beg, instructions:ins, variant:v, mediaURL:media});
-}
-function builtInLibrary(){
+/* ===================== Built-in fallback ===================== */
+function fallbackLibrary(){
   const H = (Lang.get()==="es");
   const s = (es,en)=> H?es:en;
-  const L=[];
-  // Chest
-  [["Flexiones","Push-ups","chest_pushup",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Manos bajo hombros, cuerpo en línea.","Hands under shoulders, body in line.")],
-   ["Press plano con mancuernas","DB Flat Press","chest_mid_db",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],false,true,s("Escápulas retraídas, 2s abajo/1s arriba.","Scap retracted, 2s down/1s up.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "chest", ["horizontalPush"], eq, env, uni, beg, ins, v));
-  // Back
-  [["Remo mancuerna un brazo","One-arm DB Row","back_row_db_one",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],true,true,s("Tracción hacia la cadera, sin balanceo.","Row to hip, no swing.")],
-   ["Remo con barra","Barbell Row","back_row_bb",[Equip.barbell],[Env.home,Env.gym],false,false,s("Torso 30–45°, columna neutra.","Torso 30–45°, neutral.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "back", ["horizontalPull"], eq, env, uni, beg, ins, v));
-  // Quads
-  [["Sentadilla goblet","Goblet Squat","quads_goblet",[Equip.dumbbells,Equip.kettlebell],[Env.home,Env.gym],false,true,s("Rodillas siguen puntas.","Knees track toes.")],
-   ["Split squat búlgaro","Bulgarian Split Squat","quads_bulgarian",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],true,true,s("Controla la bajada.","Control descent.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "quads", ["kneeDominant"], eq, env, uni, beg, ins, v));
-  // Hams
-  [["Peso muerto rumano DB","DB RDL","hams_rdl_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Cadera atrás, columna neutra.","Hips back, neutral.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "hamstrings", ["hipHinge"], eq, env, uni, beg, ins, v));
-  // Glutes
-  [["Glute bridge","Glute Bridge","glutes_bridge_bw",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Empuja desde talones.","Drive through heels.")],
-   ["Hip thrust en banco","Bench Hip Thrust","glutes_hipthrust_bench",[Equip.bench,Equip.dumbbells],[Env.home,Env.gym],false,true,s("Retroversión arriba.","Posterior tilt at top.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "glutes", ["hipHinge"], eq, env, uni, beg, ins, v));
-  // Shoulders
-  [["Press militar DB","DB Overhead Press","shoulders_press_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Core firme.","Brace core.")],
-   ["Elevación lateral","Lateral Raise","shoulders_lateral",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Sin impulso.","No swing.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "shoulders", ["verticalPush"], eq, env, uni, beg, ins, v));
-  // Biceps / Triceps / Core / Calves
-  [["Curl DB supinado","DB Curl (supinated)","biceps_curl_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Codo quieto.","Elbow still.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "biceps", ["elbowFlexion"], eq, env, uni, beg, ins, v));
-  [["Extensión DB sobre cabeza","DB Overhead Triceps","triceps_db_oh",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Codos fijos.","Elbows fixed.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "triceps", ["elbowExtension"], eq, env, uni, beg, ins, v));
-  [["Plancha frontal","Front Plank","core_plank",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Costillas adentro.","Ribs down.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "core", ["abAntiExtension"], eq, env, uni, beg, ins, v));
-  [["Elevación talones de pie","Standing Calf Raise","calves_standing",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Pausa 1s arriba.","1s top pause.")]]
-   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "calves", ["calfRaise"], eq, env, uni, beg, ins, v));
-
-  return L;
+  const arr = [];
+  const add = (n,m,p,eq,env,uni,beg,ins,v,media=null)=> arr.push({
+    id:makeId(), name:n, muscle:m, patterns:p, equipment:eq, environment:env, unilateral:uni, beginnerFriendly:beg, instructions:ins, variant:v, mediaURL:media
+  });
+  // Agregamos algunos por músculo (el grueso vendrá de exercises.json)
+  add(s("Flexiones","Push-ups"),"chest",["horizontalPush"],["bodyweight"],["home","gym"],false,true,s("Manos bajo hombros.","Hands under shoulders."),"chest_pushup");
+  add(s("Press plano con mancuernas","DB Flat Press"),"chest",["horizontalPush"],["dumbbells","bench"],["home","gym"],false,true,s("Escápulas retraídas.","Scap retracted."),"chest_mid_db");
+  add(s("Remo mancuerna un brazo","One-arm DB Row"),"back",["horizontalPull"],["dumbbells","bench"],["home","gym"],true,true,s("Hacia la cadera, sin balanceo.","To hip, no swing."),"back_row_db_one");
+  add(s("Barbell Row","Remo con barra"),"back",["horizontalPull"],["barbell"],["home","gym"],false,false,s("Torso 30–45°, neutro.","30–45° torso."),"back_row_bb");
+  add(s("Goblet Squat","Sentadilla goblet"),"quads",["kneeDominant"],["dumbbells","kettlebell"],["home","gym"],false,true,s("Rodillas siguen puntas.","Knees track toes."),"quads_goblet");
+  add(s("DB RDL","Peso muerto rumano DB"),"hamstrings",["hipHinge"],["dumbbells"],["home","gym"],false,true,s("Cadera atrás, neutro.","Hips back, neutral."),"hams_rdl_db");
+  add(s("Hip Thrust (banco)","Hip Thrust (bench)"),"glutes",["hipHinge"],["bench","dumbbells"],["home","gym"],false,true,s("Pausa arriba.","Top pause."),"glutes_hipthrust_bench");
+  add(s("DB Overhead Press","Press militar DB"),"shoulders",["verticalPush"],["dumbbells"],["home","gym"],false,true,s("Core firme.","Brace core."),"shoulders_press_db");
+  add(s("DB Curl","Curl DB supinado"),"biceps",["elbowFlexion"],["dumbbells"],["home","gym"],false,true,s("Codo quieto.","Elbow still."),"biceps_curl_db");
+  add(s("DB Overhead Triceps","Extensión DB sobre cabeza"),"triceps",["elbowExtension"],["dumbbells"],["home","gym"],false,true,s("Codos fijos.","Elbows fixed."),"triceps_db_oh");
+  add(s("Front Plank","Plancha frontal"),"core",["abAntiExtension"],["bodyweight"],["home","gym"],false,true,s("Costillas adentro.","Ribs down."),"core_plank");
+  add(s("Standing Calf Raise","Elevación talones de pie"),"calves",["calfRaise"],["bodyweight"],["home","gym"],false,true,s("Pausa 1s arriba.","1s top pause."),"calves_standing");
+  return arr;
 }
+
+/* ===================== Load ===================== */
 async function loadExercises(){
   try{
-    const res = await fetch("exercises.json?v=3", {cache:"no-store"});
+    const res = await fetch("exercises.json?v=4", {cache:"no-store"});
     if(!res.ok) throw new Error("HTTP "+res.status);
     const json = await res.json();
+    // Asegura IDs por si faltan
+    json.forEach(ex => { if(!ex.id) ex.id = makeId(); });
     return json.concat(CustomStore.list());
-  }catch{
-    return builtInLibrary().concat(CustomStore.list());
+  }catch(e){
+    return fallbackLibrary().concat(CustomStore.list());
   }
 }
 
@@ -225,7 +201,7 @@ function generate(){
   renderAll();
 }
 
-/* ===================== Render ===================== */
+/* ===================== UI: Header/Chips/Content ===================== */
 function renderHeader(){
   $("#appTitle").textContent = t("appTitle");
   $("#subtitle").textContent = t("selectMuscle");
@@ -248,7 +224,7 @@ function renderMuscleChips(){
   }
 }
 function flashSaved(){
-  const n = el(`<div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#00dc82;color:#000;border-radius:999px;padding:8px 14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.3)">✅ ${t('saved')}</div>`);
+  const n = (()=>{ const d=document.createElement('div'); d.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#00dc82;color:#000;border-radius:999px;padding:8px 14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:3000"; d.textContent="✅ "+t('saved'); return d;})();
   document.body.appendChild(n);
   setTimeout(()=>n.remove(),1200);
 }
@@ -266,7 +242,7 @@ function renderContent(){
     return;
   }
 
-  // Encabezado del plan
+  // Header plan
   root.appendChild(el(`<div class="card">
     <div class="row">
       <div>
@@ -276,10 +252,10 @@ function renderContent(){
     </div>
   </div>`));
 
-  // Calentamiento
+  // Warmup
   root.appendChild(el(`<div class="card"><div class="group"><h3>${t('warmup')}</h3><div class="caption">${currentPlan.warmup}</div></div></div>`));
 
-  // Ejercicios
+  // Items
   currentPlan.items.forEach((item, idx) => {
     const card = el(`<div class="card">
       <div class="row">
@@ -294,7 +270,7 @@ function renderContent(){
         </div>
       </div>
       <div class="row" style="margin-top:6px">
-        <div class="caption">⏱ ${t('rest')} ${item.restSeconds}s ${item.exercise.unilateral?` • 🔁 ${t('unilateral')}`:""}</div>
+        <div class="caption">⏱ ${t('rest')} <span data-rest>${item.restSeconds}</span>s ${item.exercise.unilateral?` • 🔁 ${t('unilateral')}`:""}</div>
         <div class="timer">
           <span class="time" data-time>0:00</span>
           <button class="btn primary small" data-act="start">${t('start')}</button>
@@ -305,28 +281,25 @@ function renderContent(){
       </div>
     </div>`);
 
-    // ---- Timer ----
+    // Timer
     const timeEl = card.querySelector("[data-time]");
+    const restEl = card.querySelector("[data-rest]");
     let remaining = item.restSeconds, running=false, int=null;
-
-    function fmt(s){ const m=Math.floor(s/60), r=s%60; return `${m}:${r.toString().padStart(2,"0")}`; }
-    function draw(){ timeEl.textContent = fmt(remaining); }
-    function start(){
+    const fmt = s => { const m=Math.floor(s/60), r=s%60; return `${m}:${r.toString().padStart(2,"0")}`; };
+    const draw = ()=> timeEl.textContent = fmt(remaining);
+    const start = ()=>{
       if(running) return;
       running = true;
       if(remaining<=0) remaining = item.restSeconds;
       int = setInterval(()=>{
         if(!running) return;
-        remaining--;
-        draw();
-        if(remaining<=0){ running=false; clearInterval(int); if(navigator.vibrate) navigator.vibrate(100); }
+        remaining--; draw();
+        if(remaining<=0){ running=false; clearInterval(int); navigator.vibrate?.(100); }
       },1000);
-    }
-    function pause(){ running=false; clearInterval(int); }
-    function reset(){ running=false; clearInterval(int); remaining=item.restSeconds; draw(); }
-
-    // editar tocando el tiempo
-    timeEl.style.cursor="pointer";
+    };
+    const pause = ()=>{ running=false; clearInterval(int); };
+    const reset = ()=>{ running=false; clearInterval(int); remaining=item.restSeconds; draw(); };
+    // Edit tapping time
     timeEl.title = t("editTime");
     timeEl.onclick = ()=>{
       const cur = remaining || item.restSeconds;
@@ -337,6 +310,7 @@ function renderContent(){
       v = Math.max(1, Math.min(600, v));
       item.restSeconds = v;
       remaining = v;
+      restEl.textContent = v;
       draw();
     };
 
@@ -349,29 +323,17 @@ function renderContent(){
       window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`,"_blank","noopener");
     };
 
-    // ---- Replace / Remove ----
-    card.querySelector('[data-act="replace"]').onclick = () => {
-      const alt = alternatives(item.exercise)[0];
-      if(!alt) return;
-      currentPlan.items[idx] = { ...item, exercise: alt };
-      renderAll();
-    };
-    card.querySelector('[data-act="remove"]').onclick = () => {
-      currentPlan.items.splice(idx,1);
-      renderAll();
-    };
+    // replace/remove
+    card.querySelector('[data-act="replace"]').onclick = (e)=>{ e.stopPropagation(); const alt = alternatives(item.exercise)[0]; if(!alt) return; currentPlan.items[idx] = { ...item, exercise: alt }; renderAll(); };
+    card.querySelector('[data-act="remove"]').onclick = (e)=>{ e.stopPropagation(); currentPlan.items.splice(idx,1); renderAll(); };
 
-    // tap en cabecera abre GIF también
-    card.querySelector(".row").onclick = (e)=>{
-      if(e.target.closest("button")) return; // no si fue botón
-      const q = encodeURIComponent(`${item.exercise.name} exercise gif`);
-      window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`,"_blank","noopener");
-    };
+    // tap card header -> GIF (evita si fue botón)
+    card.querySelector(".row").onclick = (e)=>{ if(e.target.closest("button")) return; const q = encodeURIComponent(`${item.exercise.name} exercise gif`); window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`,"_blank","noopener"); };
 
     root.appendChild(card);
   });
 
-  // Barra de acciones (antes del cooldown)
+  // Acciones
   const actions = el(`<div class="card">
     <div class="grid cols3" style="margin-top:4px">
       <button class="btn primary" id="addEx">＋ ${t('addExercise')}</button>
@@ -381,13 +343,13 @@ function renderContent(){
   </div>`);
   root.appendChild(actions);
 
-  // Cooldown (al final)
+  // Cooldown al final
   root.appendChild(el(`<div class="card"><div class="group"><h3>${t('cooldown')}</h3><div class="caption">${currentPlan.cooldown}</div></div></div>`));
 
-  // handlers de acciones
+  // Handlers
   $("#addEx").onclick = openPicker;
-  $("#saveFav").onclick = () => { Favorites.add(currentPlan); flashSaved(); };
-  $("#clearPlan").onclick = () => { currentPlan = null; renderAll(); };
+  $("#saveFav").onclick = ()=>{ Favorites.add(currentPlan); flashSaved(); };
+  $("#clearPlan").onclick = ()=>{ currentPlan=null; renderAll(); };
 }
 function renderAll(){
   L = I18N[Lang.get()];
@@ -397,17 +359,54 @@ function renderAll(){
   $("#generate").disabled = (!Filters.fullBody && !selectedMuscle);
   renderContent();
 }
-// Alias por si algún handler usa render()
-function render(){ renderAll(); }
+const el = html => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
 
-/* ===================== Filtros ===================== */
+/* ===================== Bottom Sheet (single) ===================== */
+const Sheet = (()=> {
+  const overlay = $("#overlay");
+  const sheet = $("#sheet");
+  const title = $("#sheetTitle");
+  const body = $("#sheetBody");
+  const closeBtn = $("#sheetClose");
+  let scrollY = 0;
+
+  function open({titleText, html, onOpen}){
+    title.textContent = titleText || "";
+    body.innerHTML = html || "";
+    // Bloquea scroll del body
+    scrollY = window.scrollY;
+    document.body.classList.add("no-scroll");
+    document.body.style.top = `-${scrollY}px`;
+
+    overlay.hidden = false;
+    setTimeout(()=> overlay.classList.add("show"), 10);
+    sheet.setAttribute("aria-hidden","false");
+    sheet.classList.add("open");
+
+    closeBtn.onclick = close;
+    overlay.onclick = close;
+    onOpen?.(body);
+  }
+  function close(){
+    overlay.classList.remove("show");
+    sheet.classList.remove("open");
+    sheet.setAttribute("aria-hidden","true");
+    setTimeout(()=>{ overlay.hidden = true; }, 200);
+    // Restaura scroll
+    document.body.classList.remove("no-scroll");
+    document.body.style.top = "";
+    window.scrollTo(0, scrollY);
+  }
+  return { open, close, el: body };
+})();
+
+/* ===================== Filters Sheet ===================== */
 function openFilters(){
-  const m = $("#filtersModal");
   const eqList = Object.values(Equip).map(e=>`
     <label><input type="checkbox" data-eq="${e}" ${Filters.allowedEquipment.has(e)?"checked":""}> ${equipTitle(e)}</label>
   `).join('<br>');
-  m.innerHTML = `
-    <div class="sticky"><h3 style="margin:0">${t('filters')}</h3></div>
+
+  const html = `
     <div class="grid cols2">
       <div>
         <label>${t('goal')}</label>
@@ -444,34 +443,33 @@ function openFilters(){
       <button class="btn primary" id="f_ready">✅ ${t('ready')}</button>
     </div>
   `;
-  m.querySelector('#f_goal').value = Filters.goal;
-  m.querySelector('#f_env').value = Filters.environment;
-  m.querySelector('#f_minutes').oninput = e => m.querySelector('#minsVal').textContent = e.target.value;
-  m.querySelector('#f_close').onclick = closeModals;
-  m.querySelector('#f_ready').onclick = ()=>{
-    Filters.goal = m.querySelector('#f_goal').value;
-    Filters.environment = m.querySelector('#f_env').value;
-    Filters.minutes = parseInt(m.querySelector('#f_minutes').value,10);
-    Filters.preferBeginner = m.querySelector('#f_beg').checked;
-    Filters.fullBody = m.querySelector('#f_full').checked;
-
-    const inputs = [...m.querySelectorAll('[data-eq]')];
-    const set = new Set();
-    inputs.forEach(inp => { if(inp.checked) set.add(inp.dataset.eq); });
-    Filters.allowedEquipment = set.size ? set : new Set(Object.values(Equip));
-
-    closeModals();
-    renderAll();
-  };
-  showModal('filtersModal');
+  Sheet.open({
+    titleText: t('filters'),
+    html,
+    onOpen: (root)=>{
+      root.querySelector('#f_goal').value = Filters.goal;
+      root.querySelector('#f_env').value = Filters.environment;
+      root.querySelector('#f_minutes').oninput = e => root.querySelector('#minsVal').textContent = e.target.value;
+      root.querySelector('#f_close').onclick = Sheet.close;
+      root.querySelector('#f_ready').onclick = ()=>{
+        Filters.goal = root.querySelector('#f_goal').value;
+        Filters.environment = root.querySelector('#f_env').value;
+        Filters.minutes = parseInt(root.querySelector('#f_minutes').value,10);
+        Filters.preferBeginner = root.querySelector('#f_beg').checked;
+        Filters.fullBody = root.querySelector('#f_full').checked;
+        const inputs=[...root.querySelectorAll('[data-eq]')];
+        const set = new Set(); inputs.forEach(inp=>{ if(inp.checked) set.add(inp.dataset.eq); });
+        Filters.allowedEquipment = set.size ? set : new Set(Object.values(Equip));
+        Sheet.close(); renderAll();
+      };
+    }
+  });
 }
 
-/* ===================== Picker (añadir ejercicios) ===================== */
+/* ===================== Picker Sheet ===================== */
 function openPicker(){
-  const m = $("#pickerModal");
-  const startMuscle = selectedMuscle;
   let query = "";
-  let muscleFilter = startMuscle || null;
+  let muscleFilter = selectedMuscle || null;
 
   function filtered(){
     const q = norm(query);
@@ -489,8 +487,8 @@ function openPicker(){
     ).sort((a,b)=> a.name.localeCompare(b.name));
   }
 
-  function renderPicker(){
-    const chipsMuscles = `<button class="chip ${muscleFilter==null?"active":""}" data-muscle="">${t('all')}</button>` +
+  function renderList(root){
+    const chips = `<button class="chip ${muscleFilter==null?"active":""}" data-muscle="">${t('all')}</button>` +
       Muscles.map(m=>`<button class="chip ${muscleFilter===m?"active":""}" data-muscle="${m}">${mTitle(m)}</button>`).join('');
     const items = filtered().map(ex=>`
       <tr>
@@ -498,53 +496,47 @@ function openPicker(){
         <td class="small">${mTitle(ex.muscle)}<br><span class="caption">${ex.equipment.map(equipTitle).join(", ")}</span></td>
         <td style="text-align:right"><button class="btn primary small" data-add="${ex.id}">＋</button></td>
       </tr>`).join('');
-
-    m.innerHTML = `
-      <div class="sticky">
-        <h3 style="margin:0">${t('addExercise')}</h3>
-        <div class="grid cols2" style="margin-top:8px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span>🔎</span>
-            <input id="q" placeholder="${t('searchExercises')}" autocomplete="off">
-          </div>
-          <div style="text-align:right">
-            <button class="btn secondary small" id="mkCustom">＋ ${t('createExercise')}</button>
-            <button class="btn secondary small" id="closePicker">✖️ ${t('close')}</button>
-          </div>
+    root.innerHTML = `
+      <div class="grid cols2" style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>🔎</span>
+          <input id="q" placeholder="${t('searchExercises')}" autocomplete="off">
         </div>
-        <div class="chips" id="chips">${chipsMuscles}</div>
+        <div style="text-align:right">
+          <button class="btn secondary small" id="mkCustom">＋ ${t('createExercise')}</button>
+        </div>
       </div>
+      <div class="chips" id="chips">${chips}</div>
       <table class="table">${items}</table>
     `;
-
-    m.querySelector('#q').value = query;
-    setTimeout(()=>m.querySelector('#q').focus(), 50);
-    m.querySelector('#q').oninput = e => { query = e.target.value; renderPicker(); };
-    m.querySelector('#closePicker').onclick = closeModals;
-    m.querySelector('#mkCustom').onclick = () => openNewExerciseForm(()=>{ EXERCISES = builtInLibrary().concat(CustomStore.list()); renderPicker(); });
-
-    m.querySelectorAll('[data-muscle]').forEach(b => b.onclick = () => { const v=b.dataset.muscle; muscleFilter = v? v : null; renderPicker(); });
-    m.querySelectorAll('[data-add]').forEach(btn => btn.onclick = () => {
+    root.querySelector('#q').value = query;
+    root.querySelector('#q').oninput = e => { query = e.target.value; renderList(root); };
+    root.querySelectorAll('[data-muscle]').forEach(b => b.onclick = () => { const v=b.dataset.muscle; muscleFilter = v? v : null; renderList(root); });
+    root.querySelectorAll('[data-add]').forEach(btn => btn.onclick = () => {
       const ex = filtered().find(e=>e.id===btn.dataset.add); if(!ex) return;
       openConfig(ex, (sets,repsMin,repsMax,rest)=>{
         currentPlan.items.push({ id:makeId(), exercise:ex, sets, reps:[repsMin,repsMax], restSeconds:rest,
           notes: ex.unilateral ? (Lang.get()==="es"?"Trabaja ambos lados. RPE 7–8.":"Work both sides. RPE 7–8.") : (Lang.get()==="es"?"RPE 7–8.":"RPE 7–8.") });
-        closeModals(); renderAll();
+        Sheet.close(); renderAll();
       });
     });
+    root.querySelector('#mkCustom').onclick = ()=> openNewExerciseForm(()=> renderList(root));
+    setTimeout(()=> root.querySelector('#q').focus(), 50);
   }
-  renderPicker();
-  showModal('pickerModal');
+
+  Sheet.open({
+    titleText: t('addExercise'),
+    html: `<div id="pickerRoot"></div>`,
+    onOpen: () => renderList($("#pickerRoot"))
+  });
 }
 
-/* ===================== Config (sets/reps/rest) ===================== */
+/* ===================== Config Sheet ===================== */
 function openConfig(ex, onAdd){
-  const m = $("#configModal");
   const sets = TrainingDefaults.sets(Filters.goal, Filters.minutes);
   const [rmin,rmax] = TrainingDefaults.repRange(Filters.goal);
   const rest = TrainingDefaults.rest(Filters.goal);
-  m.innerHTML = `
-    <div class="sticky"><h3 style="margin:0">${t('addExercise')}</h3></div>
+  const html = `
     <div class="group"><strong>${ex.name}</strong><div class="caption">${ex.instructions}</div></div>
     <div class="grid cols3">
       <div><label>${Lang.get()==="es"?"Series":"Sets"}</label><input type="number" id="cfg_sets" min="1" max="10" value="${sets}"></div>
@@ -557,26 +549,29 @@ function openConfig(ex, onAdd){
       <button class="btn primary" id="cfg_save">💾 ${t('save')}</button>
     </div>
   `;
-  m.querySelector('#cfg_cancel').onclick = closeModals;
-  m.querySelector('#cfg_save').onclick = () => {
-    const s = Math.max(1,Math.min(10,parseInt(m.querySelector('#cfg_sets').value||sets)));
-    const min = Math.max(1,parseInt(m.querySelector('#cfg_min').value||rmin));
-    const max = Math.max(min,parseInt(m.querySelector('#cfg_max').value||rmax));
-    const r = Math.max(15,parseInt(m.querySelector('#cfg_rest').value||rest));
-    onAdd(s,min,max,r);
-  };
-  showModal('configModal');
+  Sheet.open({
+    titleText: t('setsRepsRest'),
+    html,
+    onOpen: (root)=>{
+      root.querySelector('#cfg_cancel').onclick = Sheet.close;
+      root.querySelector('#cfg_save').onclick = ()=>{
+        const s = Math.max(1,Math.min(10,parseInt(root.querySelector('#cfg_sets').value||sets)));
+        const min = Math.max(1,parseInt(root.querySelector('#cfg_min').value||rmin));
+        const max = Math.max(min,parseInt(root.querySelector('#cfg_max').value||rmax));
+        const r = Math.max(15,parseInt(root.querySelector('#cfg_rest').value||rest));
+        onAdd(s,min,max,r);
+      };
+    }
+  });
 }
 
-/* ===================== New custom exercise ===================== */
+/* ===================== New Exercise Sheet ===================== */
 function openNewExerciseForm(onDone){
-  const m = $("#pickerModal"); // reutilizamos para mantener foco
   const eqOpts = Object.values(Equip).map(e=>`<label><input type="checkbox" data-eq="${e}"> ${equipTitle(e)}</label>`).join('<br>');
   const envOpts = [Env.home,Env.gym].map(e=>`<label><input type="checkbox" data-env="${e}" checked> ${t(e)}</label>`).join('<br>');
   const patOpts = Object.values(Pattern).map(p=>`<label><input type="checkbox" data-p="${p}"> ${p}</label>`).join('<br>');
 
-  m.innerHTML = `
-    <div class="sticky"><h3 style="margin:0">${t('createExercise')}</h3></div>
+  const html = `
     <div class="grid cols2">
       <div><label>${t('name')}</label><input id="nx_name" placeholder="${t('name')}"></div>
       <div><label>${t('muscle')}</label>
@@ -596,32 +591,37 @@ function openNewExerciseForm(onDone){
       <button class="btn secondary" id="nx_cancel">✖️ ${t('cancel')}</button>
       <button class="btn primary" id="nx_save">💾 ${t('save')}</button>
     </div>
-    <div class="footer-note">${t('custom')}</div>
+    <div class="caption" style="margin-top:6px">${t('custom')}</div>
   `;
-  m.querySelector('#nx_cancel').onclick = openPicker;
-  setTimeout(()=>m.querySelector('#nx_name').focus(),50);
-  m.querySelector('#nx_save').onclick = () => {
-    const name = (m.querySelector('#nx_name').value||"").trim() || (Lang.get()==="es"?"Ejercicio sin nombre":"Untitled exercise");
-    const muscle = m.querySelector('#nx_muscle').value;
-    const pats=[...m.querySelectorAll('[data-p]')].filter(i=>i.checked).map(i=>i.dataset.p);
-    const eq=[...m.querySelectorAll('[data-eq]')].filter(i=>i.checked).map(i=>i.dataset.eq);
-    const env=[...m.querySelectorAll('[data-env]')].filter(i=>i.checked).map(i=>i.dataset.env);
-    const unilateral = m.querySelector('#nx_uni').checked;
-    const beginner = m.querySelector('#nx_beg').checked;
-    const instructions = (m.querySelector('#nx_ins').value||"").trim() || (Lang.get()==="es"?"Ejercicio personalizado.":"Custom exercise.");
-    const mediaURL = (m.querySelector('#nx_media').value||"").trim() || null;
-    const ex = { id:makeId(), name, muscle, patterns: pats.length?pats:["hipHinge"], equipment: eq.length?eq:[Equip.bodyweight], environment: env.length?env:[Env.home,Env.gym], unilateral, beginnerFriendly: beginner, instructions, variant:`custom_${muscle}`, mediaURL };
-    CustomStore.add(ex);
-    if(typeof onDone==="function") onDone(ex);
-  };
+  Sheet.open({
+    titleText: t('createExercise'),
+    html,
+    onOpen: (root)=>{
+      root.querySelector('#nx_cancel').onclick = ()=> openPicker();
+      setTimeout(()=>root.querySelector('#nx_name').focus(),50);
+      root.querySelector('#nx_save').onclick = ()=>{
+        const name = (root.querySelector('#nx_name').value||"").trim() || (Lang.get()==="es"?"Ejercicio sin nombre":"Untitled exercise");
+        const muscle = root.querySelector('#nx_muscle').value;
+        const pats=[...root.querySelectorAll('[data-p]')].filter(i=>i.checked).map(i=>i.dataset.p);
+        const eq=[...root.querySelectorAll('[data-eq]')].filter(i=>i.checked).map(i=>i.dataset.eq);
+        const env=[...root.querySelectorAll('[data-env]')].filter(i=>i.checked).map(i=>i.dataset.env);
+        const unilateral = root.querySelector('#nx_uni').checked;
+        const beginner = root.querySelector('#nx_beg').checked;
+        const instructions = (root.querySelector('#nx_ins').value||"").trim() || (Lang.get()==="es"?"Ejercicio personalizado.":"Custom exercise.");
+        const mediaURL = (root.querySelector('#nx_media').value||"").trim() || null;
+        const ex = { id:makeId(), name, muscle, patterns: pats.length?pats:["hipHinge"], equipment: eq.length?eq:["bodyweight"], environment: env.length?env:["home","gym"], unilateral, beginnerFriendly: beginner, instructions, variant:`custom_${muscle}`, mediaURL };
+        CustomStore.add(ex);
+        EXERCISES.push(ex);
+        onDone?.(ex);
+      };
+    }
+  });
 }
 
-/* ===================== Favorites ===================== */
+/* ===================== Favorites Sheet ===================== */
 function openFavorites(){
-  const m = $("#favoritesModal");
   const list = Favorites.list();
-  m.innerHTML = `
-    <div class="sticky"><h3 style="margin:0">${t('favorites')}</h3></div>
+  const html = `
     ${!list.length? `<div class="caption" style="padding:10px">${Lang.get()==="es"?"Aún no hay favoritos.":"No favorites yet."}</div>`: ""}
     <div>
       ${list.map((p,i)=>`
@@ -639,25 +639,26 @@ function openFavorites(){
         </div>
       `).join('')}
     </div>
-    <div><button class="btn secondary" id="favClose">✖️ ${t('close')}</button></div>
   `;
-  m.querySelector('#favClose').onclick = closeModals;
-  m.querySelectorAll('[data-use]').forEach(b => b.onclick = () => {
-    const plan = Favorites.list()[parseInt(b.dataset.use,10)];
-    currentPlan = plan; closeModals(); renderAll();
+  Sheet.open({
+    titleText: t('favorites'),
+    html,
+    onOpen: (root)=>{
+      root.querySelectorAll('[data-use]').forEach(b => b.onclick = ()=>{
+        const plan = Favorites.list()[parseInt(b.dataset.use,10)];
+        currentPlan = plan; Sheet.close(); renderAll();
+      });
+      root.querySelectorAll('[data-del]').forEach(b => b.onclick = ()=>{
+        Favorites.removeAt(parseInt(b.dataset.del,10)); openFavorites();
+      });
+    }
   });
-  m.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
-    Favorites.removeAt(parseInt(b.dataset.del,10)); openFavorites();
-  });
-  showModal('favoritesModal');
 }
 
-/* ===================== Settings ===================== */
+/* ===================== Settings Sheet ===================== */
 function openSettings(){
-  const m = $("#settingsModal");
   const cur = localStorage.getItem(Lang.key)||"es";
-  m.innerHTML = `
-    <div class="sticky"><h3 style="margin:0">${t('settings')}</h3></div>
+  const html = `
     <div class="group">
       <label>${t('language')}</label>
       <select id="s_lang">
@@ -674,16 +675,16 @@ function openSettings(){
       <label>${t('supportDev')}</label>
       <div class="caption">${t('tipJar')} — ${Lang.get()==="es"?"(en web es informativo)":"(informational on web)"}.</div>
     </div>
-    <div><button class="btn secondary" id="s_close">✖️ ${t('close')}</button></div>
   `;
-  m.querySelector('#s_lang').value = cur;
-  m.querySelector('#s_close').onclick = closeModals;
-  m.querySelector('#s_lang').onchange = e => {
-    Lang.set(e.target.value);
-    EXERCISES = builtInLibrary().concat(CustomStore.list());
-    renderAll();
-  };
-  showModal('settingsModal');
+  Sheet.open({
+    titleText: t('settings'),
+    html,
+    onOpen: (root)=>{
+      const sel = root.querySelector('#s_lang');
+      sel.value = cur;
+      sel.onchange = e => { Lang.set(e.target.value); renderAll(); };
+    }
+  });
 }
 
 /* ===================== Events & Boot ===================== */
@@ -694,6 +695,9 @@ $("#btnSettings").onclick = openSettings;
 $("#generate").onclick = generate;
 
 async function boot(){
+  L = I18N[Lang.get()];
+  applyStaticI18n();
+  $("#subtitle").textContent = t("selectMuscle");
   EXERCISES = await loadExercises();
   renderAll();
 }
