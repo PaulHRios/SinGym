@@ -1,7 +1,6 @@
-// app.js
-import { EXERCISES } from "./ejercicios.js";
+// app.js (sin módulos)
 
-/* ========= Estado ========= */
+// ===== Estado / Constantes =====
 const Env = { home:"home", gym:"gym" };
 const Equip = { bodyweight:"bodyweight", dumbbells:"dumbbells", kettlebell:"kettlebell", barbell:"barbell", bench:"bench", bands:"bands", cable:"cable", machine:"machine", smith:"smith" };
 
@@ -9,7 +8,7 @@ const MUSCLES = [
   {key:"chest",      es:"Pecho"},
   {key:"back",       es:"Espalda"},
   {key:"quads",      es:"Cuádriceps"},
-  {key:"hamstrings", es:"Femoral"},   // <- renombrado como "Femoral"
+  {key:"hamstrings", es:"Femoral"},
   {key:"glutes",     es:"Glúteos"},
   {key:"shoulders",  es:"Hombros"},
   {key:"biceps",     es:"Bíceps"},
@@ -20,18 +19,16 @@ const MUSCLES = [
 
 const DEFAULT_FILTERS = {
   environment: Env.home,
-  // Por defecto: TODO activo MENOS cable, machine y smith
-  allowedEquipment: new Set(Object.values(Equip).filter(e => !["cable","machine","smith"].includes(e))),
+  allowedEquipment: new Set(Object.values(Equip).filter(e => !["cable","machine","smith"].includes(e))), // por defecto desactivados
   minutes: 30,
-  preferBeginner: false,  // por defecto NO “enfocar a principiantes”
-  goal: "hypertrophy",    // strength | hypertrophy | fatLoss | maintenance
+  preferBeginner: false, // por defecto NO principiantes
+  goal: "hypertrophy",
   fullBody: false,
 };
 
 let Filters = {...DEFAULT_FILTERS};
 let selectedMuscle = null;
 let currentPlan = null;
-let AllExercises = [...EXERCISES, ...getCustom()];
 
 const Storage = {
   get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{return def;} },
@@ -39,27 +36,25 @@ const Storage = {
 };
 const CustomKey = "custom_exercises_v1";
 const FavKey = "favorite_plans_v2";
-function getCustom(){ return Storage.get(CustomKey,[]); }
-function saveCustom(list){ Storage.set(CustomKey, list); }
 const Favorites = {
   list(){ return Storage.get(FavKey,[]); },
   add(plan){ const arr=this.list(); arr.unshift(plan); Storage.set(FavKey,arr); },
   removeAt(i){ const arr=this.list(); arr.splice(i,1); Storage.set(FavKey,arr); }
 };
 
-const TrainingDefaults = {
-  targetExercises(duration, fullBody){ if(duration<30) return fullBody?3:2; if(duration<45) return fullBody?4:3; if(duration<60) return fullBody?5:4; if(duration<90) return fullBody?6:5; return fullBody?6:6; },
-  sets(goal, duration){ switch(goal){ case "strength": return duration<40?3:4; case "hypertrophy": return duration<40?3:4; case "fatLoss": return 3; case "maintenance": return 3; } },
-  repRange(goal){ switch(goal){ case "strength": return [4,6]; case "hypertrophy": return [8,12]; case "fatLoss": return [12,20]; case "maintenance": return [8,12]; } },
-  rest(goal){ switch(goal){ case "strength": return 120; case "hypertrophy": return 90; case "fatLoss": return 60; case "maintenance": return 75; } }
-};
+// Carga ejercicios (desde window.EXERCISES)
+function getCustom(){ return Storage.get(CustomKey,[]); }
+function saveCustom(list){ Storage.set(CustomKey, list); }
+let AllExercises = Array.isArray(window.EXERCISES) ? [...window.EXERCISES, ...getCustom()] : [];
 
-/* ========= Utilidades ========= */
+// ===== Utilidades =====
 const qs = s => document.querySelector(s);
 const qsa = s => [...document.querySelectorAll(s)];
 const el = html => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
 const uuid = () => (crypto.randomUUID?.() ?? (Date.now()+"-"+Math.random().toString(16).slice(2)));
 const shuffle = a => { const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [x[i],x[j]]=[x[j],x[i]];} return x; };
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const intVal = (sel, def)=>{ const v=parseInt(qs(sel).value||def,10); return isNaN(v)?def:v; };
 
 function muscleTitle(key){ return (MUSCLES.find(m=>m.key===key)?.es) || key; }
 function equipmentTitle(e){
@@ -70,8 +65,11 @@ function patternTitle(p){
   const map = {horizontalPush:"Empuje horizontal",verticalPush:"Empuje vertical",horizontalPull:"Tracción horizontal",verticalPull:"Tracción vertical",kneeDominant:"Dominante rodilla",hipHinge:"Bisagra cadera",elbowFlexion:"Flexión codo",elbowExtension:"Extensión codo",abAntiExtension:"Anti-extensión",abAntiRotation:"Anti-rotación",abFlexion:"Flexión abdominal",abLateralFlexion:"Flexión lateral",calfRaise:"Pantorrilla"};
   return map[p] || p;
 }
+function goalTitle(g){
+  return {strength:"Fuerza", hypertrophy:"Hipertrofia", fatLoss:"Pérdida de grasa", maintenance:"Mantenimiento"}[g] || g;
+}
 
-/* ========= Modal helpers ========= */
+// ===== Modal helpers =====
 function openModal(id){
   qs("#overlay").classList.remove("hidden");
   qs(id).classList.remove("hidden");
@@ -82,9 +80,14 @@ function closeModals(){
   qsa(".modal").forEach(m=>m.classList.add("hidden"));
   document.body.style.overflow="";
 }
-qs("#overlay").addEventListener("click", closeModals);
 
-/* ========= Pool & generación ========= */
+// ===== Lógica de generación =====
+const TrainingDefaults = {
+  targetExercises(duration, fullBody){ if(duration<30) return fullBody?3:2; if(duration<45) return fullBody?4:3; if(duration<60) return fullBody?5:4; if(duration<90) return fullBody?6:5; return fullBody?6:6; },
+  sets(goal, duration){ switch(goal){ case "strength": return duration<40?3:4; case "hypertrophy": return duration<40?3:4; case "fatLoss": return 3; case "maintenance": return 3; } },
+  repRange(goal){ switch(goal){ case "strength": return [4,6]; case "hypertrophy": return [8,12]; case "fatLoss": return [12,20]; case "maintenance": return [8,12]; } },
+  rest(goal){ switch(goal){ case "strength": return 120; case "hypertrophy": return 90; case "fatLoss": return 60; case "maintenance": return 75; } }
+};
 function pool(muscle){
   return AllExercises.filter(ex =>
     ex.environment.includes(Filters.environment) &&
@@ -146,7 +149,7 @@ function generate(){
   render();
 }
 
-/* ========= Render ========= */
+// ===== Render =====
 function renderHeader(){
   qs("#appTitle").textContent = "Rutinas en casa";
   qs("#subtitle").textContent = "Elige un músculo o usa Cuerpo completo";
@@ -177,7 +180,14 @@ function renderContent(){
   const root = qs("#content");
   root.innerHTML = "";
 
-  // Botón “generar” habilitado solo si hay músculo o fullBody
+  // si no cargó ejercicios, avisar
+  if(!Array.isArray(AllExercises) || AllExercises.length===0){
+    root.appendChild(el(`<div class="empty"><div>⚠️ No se cargaron los ejercicios.<br>Verifica que <strong>ejercicios.js</strong> esté en la misma carpeta y se incluya antes de <strong>app.js</strong>.</div></div>`));
+    qs("#generate").disabled = true;
+    return;
+  }
+
+  // Generar habilitado solo si hay músculo o fullBody
   qs("#generate").disabled = (!Filters.fullBody && !selectedMuscle);
 
   if(!currentPlan){
@@ -211,7 +221,7 @@ function renderContent(){
   `));
 
   // Items
-  currentPlan.items.forEach((item, idx) => {
+  currentPlan.items.forEach((item) => {
     const card = el(`
       <div class="card" data-item="${item.id}">
         <div class="row">
@@ -251,7 +261,7 @@ function renderContent(){
     </div>
   `));
 
-  // Botonera final
+  // Acciones finales
   const actions = el(`
     <div class="card">
       <div class="row" style="flex-wrap:wrap; gap:10px">
@@ -263,7 +273,7 @@ function renderContent(){
   `);
   root.appendChild(actions);
 
-  // Acciones globales
+  // Hooks
   qs("#addEx").onclick = () => openPicker();
   qs("#saveFav").onclick = () => { Favorites.add(currentPlan); toast("Guardado ✅"); };
   qs("#clearPlan").onclick = () => { currentPlan = null; render(); };
@@ -274,18 +284,13 @@ function render(){
   renderContent();
 }
 
-/* ========= Título objetivo ========= */
-function goalTitle(g){
-  return {strength:"Fuerza", hypertrophy:"Hipertrofia", fatLoss:"Pérdida de grasa", maintenance:"Mantenimiento"}[g] || g;
-}
-
-/* ========= Toast ========= */
+// ===== Toast =====
 function toast(msg){
   const n = el(`<div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#00dc82; color:#05150e; font-weight:800; border-radius:999px;padding:8px 14px; z-index:999">${msg}</div>`);
   document.body.appendChild(n); setTimeout(()=>n.remove(), 1300);
 }
 
-/* ========= Timers (delegación) ========= */
+// ===== Timers (delegación) =====
 const timers = new Map(); // id -> {remaining,running,int,default}
 function formatTime(s){ const m=(s/60)|0; const r=s%60; return `${m}:${String(r).padStart(2,"0")}`; }
 function ensureTimer(itemId, defaultSeconds){
@@ -294,20 +299,20 @@ function ensureTimer(itemId, defaultSeconds){
   }
   return timers.get(itemId);
 }
-
 qs("#content").addEventListener("click", (e)=>{
   const card = e.target.closest(".card[data-item]"); if(!card) return;
   const itemId = card.getAttribute("data-item");
-  const item = currentPlan.items.find(i=>i.id===itemId);
+  const item = currentPlan?.items.find(i=>i.id===itemId);
   if(!item) return;
+
   const T = ensureTimer(itemId, item.restSeconds);
   const actBtn = e.target.closest("[data-act]");
   const timeEl = card.querySelector("[data-time]");
 
-  // Editar tiempo tocando el número
+  // Editar tiempo
   if(e.target === timeEl){
     openTimeEditor(T.default, (newSec)=>{
-      T.default = Math.max(1, Math.min(600, newSec));
+      T.default = clamp(newSec,1,600);
       T.remaining = T.default; T.running=false; if(T.int) clearInterval(T.int);
       timeEl.textContent = formatTime(T.remaining);
     });
@@ -340,9 +345,8 @@ qs("#content").addEventListener("click", (e)=>{
     timeEl.textContent = formatTime(T.remaining);
   }
   if(act==="gif"){
-    if(item.exercise.mediaURL){
-      openMedia(item.exercise.mediaURL, item.exercise.name);
-    } else {
+    if(item.exercise.mediaURL){ openMedia(item.exercise.mediaURL, item.exercise.name); }
+    else{
       const q = encodeURIComponent(`${item.exercise.name} ejercicio gif`);
       window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`, "_blank");
     }
@@ -358,7 +362,7 @@ qs("#content").addEventListener("click", (e)=>{
   }
 });
 
-/* ========= Editor de tiempo ========= */
+// ===== Editor de tiempo =====
 function openTimeEditor(defaultSec, onSave){
   const m = qs("#modalConfig");
   m.innerHTML = `
@@ -387,16 +391,15 @@ function openTimeEditor(defaultSec, onSave){
   qs("#te_ok").onclick=()=>{
     let mins = parseInt(qs("#te_min").value||0,10);
     let secs = parseInt(qs("#te_sec").value||0,10);
-    mins = Math.max(0,Math.min(10,mins));
-    secs = Math.max(0,Math.min(59,secs));
-    const total = Math.max(1, Math.min(600, mins*60+secs));
+    mins = clamp(mins,0,10); secs = clamp(secs,0,59);
+    const total = clamp(mins*60+secs,1,600);
     onSave(total);
     closeModals();
   };
   openModal("#modalConfig");
 }
 
-/* ========= Media modal ========= */
+// ===== Media modal =====
 function openMedia(url, title){
   const m = qs("#modalMedia");
   m.innerHTML = `
@@ -411,12 +414,13 @@ function openMedia(url, title){
   openModal("#modalMedia");
 }
 
-/* ========= Picker (añadir ejercicio) ========= */
+// ===== Picker (añadir ejercicio) =====
 function openPicker(){
   const m = qs("#modalPicker");
   let query = "";
   let muscleFilter = selectedMuscle || null;
 
+  const norm = s => (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   function filtered(){
     const q = norm(query);
     return AllExercises
@@ -434,11 +438,10 @@ function openPicker(){
       )
       .sort((a,b)=> a.name.localeCompare(b.name));
   }
-  function norm(s){ return (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
 
   function renderPicker(){
     const chips = `<button class="muscle ${muscleFilter==null?"active":""}" data-mus="">Todos</button>` +
-      MUSCLES.map(m=>`<button class="muscle ${muscleFilter===m.key?"active":""}" data-mus="${m.key}">${m.es}</button>`).join('');
+      MUSCLES.map(mm=>`<button class="muscle ${muscleFilter===mm.key?"active":""}" data-mus="${mm.key}">${mm.es}</button>`).join('');
 
     m.innerHTML = `
       <div class="sticky">
@@ -477,7 +480,7 @@ function openPicker(){
     setTimeout(()=>qs("#pk_q").focus(), 50);
     qs("#pk_q").oninput = e=>{ query=e.target.value; renderPicker(); };
     qs("#pk_close").onclick=closeModals;
-    qs("#pk_new").onclick=()=>openNewExerciseForm(()=>{ AllExercises=[...EXERCISES, ...getCustom()]; renderPicker(); });
+    qs("#pk_new").onclick=()=>openNewExerciseForm(()=>{ AllExercises=[...(window.EXERCISES||[]), ...getCustom()]; renderPicker(); });
     qsa("[data-mus]").forEach(b=>b.onclick=()=>{ muscleFilter = b.dataset.mus || null; renderPicker(); });
     qsa("[data-add]").forEach(b=>b.onclick=()=>{
       const ex = filtered().find(e=>e.variant===b.dataset.add);
@@ -492,7 +495,7 @@ function openPicker(){
   openModal("#modalPicker");
 }
 
-/* ========= Config (sets/reps/rest) ========= */
+// ===== Config (sets/reps/rest) =====
 function openConfig(ex, onAdd){
   const m = qs("#modalConfig");
   const sets = TrainingDefaults.sets(Filters.goal, Filters.minutes);
@@ -528,10 +531,8 @@ function openConfig(ex, onAdd){
   };
   openModal("#modalConfig");
 }
-function intVal(sel, def){ const v=parseInt(qs(sel).value||def,10); return isNaN(v)?def:v; }
-function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 
-/* ========= Crear ejercicio nuevo ========= */
+// ===== Nuevo ejercicio =====
 function openNewExerciseForm(onDone){
   const m = qs("#modalPicker");
   const eqOpts = Object.values(Equip).map(e=>`<label><input type="checkbox" data-eq="${e}" ${["bodyweight","dumbbells","bench","bands"].includes(e)?"checked":""}> ${equipmentTitle(e)}</label>`).join('<br>');
@@ -545,7 +546,7 @@ function openNewExerciseForm(onDone){
       <div><label>Nombre</label><input id="nx_name" placeholder="Nombre"></div>
       <div><label>Músculo</label>
         <select id="nx_muscle">
-          ${MUSCLES.map(m=>`<option value="${m.key}">${m.es}</option>`).join('')}
+          ${MUSCLES.map(mm=>`<option value="${mm.key}">${mm.es}</option>`).join('')}
         </select>
       </div>
     </div>
@@ -562,9 +563,9 @@ function openNewExerciseForm(onDone){
       <button id="nx_cancel" class="btn soft">✖️ Cancelar</button>
       <button id="nx_save" class="btn primary">💾 Guardar</button>
     </div>
-    <div class="footer-note">Se guarda localmente (puedes exportar luego).</div>
+    <div class="footer-note">Se guarda localmente.</div>
   `;
-  qs("#nx_cancel").onclick = openPicker; // volver al picker
+  qs("#nx_cancel").onclick = openPicker;
   setTimeout(()=>qs("#nx_name").focus(), 50);
   qs("#nx_save").onclick = ()=>{
     const name = (qs("#nx_name").value||"").trim() || "Ejercicio sin nombre";
@@ -584,12 +585,12 @@ function openNewExerciseForm(onDone){
     };
     const list = getCustom();
     list.unshift(ex); saveCustom(list);
-    AllExercises = [...EXERCISES, ...getCustom()];
+    AllExercises = [...(window.EXERCISES||[]), ...getCustom()];
     if(typeof onDone==="function") onDone(ex);
   };
 }
 
-/* ========= Filtros ========= */
+// ===== Filtros / Favoritos / Ajustes =====
 function openFilters(){
   const m = qs("#modalFilters");
   const eqList = Object.values(Equip).map(e=>`
@@ -656,8 +657,6 @@ function openFilters(){
   };
   openModal("#modalFilters");
 }
-
-/* ========= Favoritos ========= */
 function openFavorites(){
   const m = qs("#modalFavorites");
   const list = Favorites.list();
@@ -692,8 +691,6 @@ function openFavorites(){
   });
   openModal("#modalFavorites");
 }
-
-/* ========= Settings ========= */
 function openSettings(){
   const m = qs("#modalSettings");
   m.innerHTML = `
@@ -711,13 +708,14 @@ function openSettings(){
   openModal("#modalSettings");
 }
 
-/* ========= Eventos de UI ========= */
+// ===== Bootstrap =====
 document.addEventListener("DOMContentLoaded", ()=>{
-  // Botonera superior
+  // Enlazar botones de la barra
   qs("#btnFilters").addEventListener("click", openFilters);
   qs("#openFilters").addEventListener("click", openFilters);
   qs("#btnFavorites").addEventListener("click", openFavorites);
   qs("#btnSettings").addEventListener("click", openSettings);
+  qs("#overlay").addEventListener("click", closeModals);
   qs("#generate").addEventListener("click", generate);
 
   // Render inicial
