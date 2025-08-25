@@ -4,44 +4,44 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Rutinas en casa • Web</title>
-
-<!-- CSS (tu mismo styles.css; agregamos ?v=3 para forzar actualización en Safari) -->
-<link rel="stylesheet" href="styles.css?v=3">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div>
-      <div class="h1" id="appTitle">Rutinas en casa</div>
-      <div class="sub" id="subtitle"></div>
+  <div class="container">
+    <header class="header">
+      <div>
+        <h1 id="appTitle">Rutinas en casa</h1>
+        <p class="sub" id="subtitle"></p>
+      </div>
+      <nav class="toolbar">
+        <button id="btnFavorites" class="nav-btn">❤️ <span data-i="favorites">Favoritos</span></button>
+        <button id="btnFilters" class="nav-btn">🎚️ <span data-i="filters">Filtros</span></button>
+        <button id="btnSettings" class="nav-btn">⚙️ <span data-i="settings">Ajustes</span></button>
+      </nav>
+    </header>
+
+    <div class="chips" id="muscleChips"></div>
+
+    <div class="controls">
+      <button class="btn secondary" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
+      <button class="btn primary" id="generate" disabled>⚡ <span data-i="generate">Generar</span></button>
     </div>
-    <div class="toolbar">
-      <button id="btnFavorites">❤️ <span data-i="favorites">Favoritos</span></button>
-      <button id="btnFilters">🎚️ <span data-i="filters">Filtros</span></button>
-      <button id="btnSettings">⚙️ <span data-i="settings">Ajustes</span></button>
-      <a id="publishLink" href="https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site" target="_blank" rel="noopener" style="display:none">Publicar</a>
-    </div>
+
+    <main id="content"></main>
   </div>
 
-  <div class="chips" id="muscleChips"></div>
+  <!-- Overlay + Bottom Sheet -->
+  <div id="overlay" class="overlay" hidden></div>
+  <aside id="sheet" class="sheet" aria-hidden="true">
+    <div class="sheet-handle"></div>
+    <header class="sheet-header">
+      <h2 id="sheetTitle"></h2>
+      <button id="sheetClose" class="icon-btn" aria-label="Cerrar">✖</button>
+    </header>
+    <section id="sheetBody" class="sheet-body"></section>
+    <div class="sheet-safe"></div>
+  </aside>
 
-  <div class="controls">
-    <button class="btn secondary" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
-    <button class="btn primary" id="generate" disabled>⚡ <span data-i="generate">Generar</span></button>
-  </div>
-
-  <div id="content"></div>
-</div>
-
-<!-- Modals -->
-<div class="modal-back" id="backdrop"></div>
-<div class="modal" id="filtersModal"></div>
-<div class="modal" id="pickerModal"></div>
-<div class="modal" id="favoritesModal"></div>
-<div class="modal" id="settingsModal"></div>
-<div class="modal" id="configModal"></div>
-
-<!-- JS (agregamos ?v=3 para cache-bust) -->
-<script defer src="app.js?v=3"></script>
+  <script defer src="app.js?v=4"></script>
 </body>
 </html>
