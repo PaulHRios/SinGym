@@ -1,124 +1,70 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1114" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0b0c0d">
   <title>SinGym — Rutinas en casa</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1" />
+  <link rel="stylesheet" href="styles.css?v=1.0">
 </head>
 <body>
-  <!-- Fondo aurora -->
-  <div class="aurora">
-    <span class="a a1"></span>
-    <span class="a a2"></span>
-    <span class="a a3"></span>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🏋️‍♂️</div>
+        <div>
+          <h1 id="appTitle">Rutinas en casa</h1>
+          <p class="muted" id="subtitle">Elige un músculo o activa Cuerpo completo y presiona Generar.</p>
+        </div>
+      </div>
+      <nav class="actions">
+        <button class="icon-btn" id="btnFavorites" aria-label="Favoritos" title="Favoritos">
+          <span class="ico">❤️</span><span class="hide-sm" data-i="favorites">Favoritos</span>
+        </button>
+        <button class="icon-btn" id="btnFilters" aria-label="Filtros" title="Filtros">
+          <span class="ico">🎚️</span><span class="hide-sm" data-i="filters">Filtros</span>
+        </button>
+        <button class="icon-btn" id="btnSettings" aria-label="Ajustes" title="Ajustes">
+          <span class="ico">⚙️</span><span class="hide-sm" data-i="settings">Ajustes</span>
+        </button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="chips" id="muscleChips"></section>
+
+      <section class="controls">
+        <button class="btn ghost" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
+        <button class="btn primary" id="generate">⚡ <span data-i="generate">Generar</span></button>
+      </section>
+
+      <section id="content"></section>
+    </main>
+
+    <footer class="foot muted">
+      SinGym © 2025 — LocalStorage, sin cuentas.
+    </footer>
   </div>
 
-  <!-- Topbar -->
-  <header class="topbar glass">
-    <div class="brand">
-      <div class="logo">🏋️‍♂️</div>
-      <div>
-        <h1 id="appTitle">SinGym</h1>
-        <p class="muted" id="subtitle">Genera rutinas bonitas, rápido.</p>
-      </div>
-    </div>
-    <nav class="actions">
-      <button id="btnFavorites" class="btn ghost" title="Favoritos">❤️ <span data-i="favorites">Favoritos</span></button>
-      <button id="btnSettings" class="btn ghost" title="Ajustes">⚙️ <span data-i="settings">Ajustes</span></button>
-      <a class="btn primary" href="https://github.com/new" target="_blank" rel="noopener">Publicar</a>
-    </nav>
-  </header>
-
-  <!-- Contenido -->
-  <main class="container">
-    <section class="card glass">
-      <div class="row wrap gap">
-        <div class="col">
-          <label class="lbl" data-i="muscle">Músculo</label>
-          <div id="muscleChips" class="chips scroll"></div>
-        </div>
-        <div class="col-auto">
-          <label class="lbl" data-i="fullBody">Cuerpo completo</label>
-          <label class="switch">
-            <input type="checkbox" id="chkFullBody" />
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="row wrap gap mt">
-        <div class="col">
-          <label class="lbl" data-i="goal">Objetivo</label>
-          <div id="goalGroup" class="segmented">
-            <button class="seg active" data-value="hypertrophy" data-i="hypertrophy">Hipertrofia</button>
-            <button class="seg" data-value="strength" data-i="strength">Fuerza</button>
-            <button class="seg" data-value="fatLoss" data-i="fatLoss">Pérdida de grasa</button>
-            <button class="seg" data-value="maintenance" data-i="maintenance">Mantenimiento</button>
-          </div>
-        </div>
-        <div class="col-auto minutes">
-          <label class="lbl" data-i="minutes">Minutos</label>
-          <div class="range">
-            <input type="range" id="minutes" min="20" max="120" step="5" value="30" />
-            <span id="minutesLabel">30 min</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="row wrap gap mt">
-        <div class="col">
-          <label class="lbl" data-i="environment">Entorno</label>
-          <div id="envGroup" class="segmented">
-            <button class="seg active" data-value="home" data-i="home">Casa</button>
-            <button class="seg" data-value="gym" data-i="gym">Gimnasio</button>
-          </div>
-        </div>
-        <div class="col">
-          <label class="lbl" data-i="equipment">Equipo disponible</label>
-          <div id="equipmentChips" class="chips wrap"></div>
-        </div>
-        <div class="col-auto">
-          <label class="lbl" data-i="beginner">Principiantes</label>
-          <label class="switch">
-            <input type="checkbox" id="chkBeginner" checked />
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="row gap mt">
-        <button id="btnGenerate" class="btn primary wide">⚡ <span data-i="generate">Generar</span></button>
-        <button id="btnFilters" class="btn subtle wide">🎚️ <span data-i="filters">Filtros</span></button>
-      </div>
-    </section>
-
-    <section id="content"></section>
-
-    <section id="emptyState" class="empty">
-      <div class="emoji">💪</div>
-      <p data-i="selectMuscle">Elige un músculo o activa <b>Cuerpo completo</b>, y presiona <b>Generar</b>.</p>
-    </section>
-  </main>
-
-  <!-- Backdrop para modales -->
+  <!-- Backdrop -->
   <div class="backdrop" id="backdrop"></div>
 
-  <!-- Modales recicables -->
-  <dialog id="filtersModal" class="modal glass"></dialog>
-  <dialog id="pickerModal" class="modal glass"></dialog>
-  <dialog id="favoritesModal" class="modal glass"></dialog>
-  <dialog id="settingsModal" class="modal glass"></dialog>
-  <dialog id="configModal" class="modal glass"></dialog>
-  <dialog id="timerModal" class="modal small glass"></dialog>
-  <dialog id="mediaModal" class="modal large glass"></dialog>
+  <!-- Modals / Sheets -->
+  <div class="sheet" id="filtersModal" role="dialog" aria-modal="true"></div>
+  <div class="sheet" id="pickerModal" role="dialog" aria-modal="true"></div>
+  <div class="sheet" id="favoritesModal" role="dialog" aria-modal="true"></div>
+  <div class="sheet" id="settingsModal" role="dialog" aria-modal="true"></div>
+  <div class="sheet" id="configModal" role="dialog" aria-modal="true"></div>
+  <div class="lightbox" id="gifLightbox" aria-modal="true" role="dialog">
+    <div class="lightbox-inner">
+      <button class="close-x" id="gifClose" aria-label="Cerrar">✖</button>
+      <iframe id="gifFrame" title="GIF" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+      <div class="lightbox-fallback muted" id="gifFallback"></div>
+    </div>
+  </div>
 
-  <footer class="foot muted">SinGym © 2025 — LocalStorage, sin cuentas.</footer>
-
-  <script src="app.js"></script>
+  <script defer src="app.js?v=1.0"></script>
 </body>
 </html>
