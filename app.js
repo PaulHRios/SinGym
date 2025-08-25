@@ -97,9 +97,23 @@ const FavKey = "favorite_plans_v2";
 /* ===== Training defaults ===== */
 const TrainingDefaults = {
   targetExercises(d, full){ if(d<30) return full?3:2; if(d<45) return full?4:3; if(d<60) return full?5:4; if(d<90) return full?6:5; return full?6:6; },
-  sets(goal,d){ switch(goal){ case Goal.strength: return d<40?3:4; case Goal.hypertrophy: return d<40?3:4; case Goal.fatLoss: return 3; case Goal.maintenance: return 3;} },
-  repRange(goal){ switch(goal){ case Goal.strength: return [4,6]; case Goal.hypertrophy:[8,12]; case Goal.fatLoss:[12,20]; case Goal.maintenance:[8,12]; } },
-  rest(goal){ switch(goal){ case Goal.strength: return 120; case Goal.hypertrophy: 90; case Goal.fatLoss:60; case Goal.maintenance:75; } }
+  sets(goal,d){ switch(goal){ case Goal.strength: return d<40?3:4; case Goal.hypertrophy: return d<40?3:4; case Goal.fatLoss: return 3; case Goal.maintenance: return 3; } },
+  repRange(goal){
+    switch(goal){
+      case Goal.strength: return [4,6];
+      case Goal.hypertrophy: return [8,12];
+      case Goal.fatLoss: return [12,20];
+      case Goal.maintenance: return [8,12];
+    }
+  },
+  rest(goal){
+    switch(goal){
+      case Goal.strength: return 120;
+      case Goal.hypertrophy: return 90;
+      case Goal.fatLoss: return 60;
+      case Goal.maintenance: return 75;
+    }
+  }
 };
 
 /* ===== Exercise library (subset rico) ===== */
