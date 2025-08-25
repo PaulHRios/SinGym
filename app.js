@@ -1,98 +1,181 @@
-/* ====== Language (default Español) ====== */
-const LangKey = "app_lang_v1";
-function getLang(){
-  const raw = localStorage.getItem(LangKey);
-  if(!raw) return "es"; // por defecto español
-  if(raw === "system") return (navigator.language||"en").toLowerCase().startsWith("es") ? "es":"en";
-  return raw;
-}
-let LANG = getLang();
+/* ===================== i18n ===================== */
 const I18N = {
-  es: { appTitle:"Rutinas en casa", fullBody:"Cuerpo completo", generate:"Generar", filters:"Filtros", selectMuscle:"Elige un músculo o usa Cuerpo completo", minutes:"Minutos", goal:"Objetivo", environment:"Entorno", equipment:"Equipo disponible", beginner:"Enfocar a principiantes", home:"Casa", gym:"Gimnasio", strength:"Fuerza", hypertrophy:"Hipertrofia", fatLoss:"Pérdida de grasa", maintenance:"Mantenimiento", warmup:"Calentamiento", cooldown:"Vuelta a la calma", rest:"Descanso", unilateral:"Unilateral", favorites:"Favoritos", saveFavorite:"Guardar en favoritos", saved:"Guardado", timer:"Temporizador", start:"Iniciar", pause:"Pausar", reset:"Reiniciar", ready:"Listo", close:"Cerrar", timeBased:"Duración estimada", replace:"Sustituir", clear:"Limpiar", settings:"Ajustes", language:"Idioma", systemLang:"Sistema", addExercise:"Añadir ejercicio", remove:"Eliminar", searchExercises:"Buscar ejercicios", createExercise:"Crear ejercicio", patterns:"Patrones", unilateralQ:"¿Unilateral?", beginnerQ:"Apto principiantes", instructions:"Instrucciones", mediaURL:"URL multimedia (opcional)", save:"Guardar", cancel:"Cancelar", setsRepsRest:"Series / Reps / Descanso", name:"Nombre", email:"Correo", message:"Mensaje", send:"Enviar", thanksFeedback:"¡Gracias!", supportDev:"Apoyar al desarrollador", tipJar:"Invítame un café", loading:"Cargando…", custom:"Personalizado", all:"Todos", use:"Usar", editTime:"Editar tiempo", max1000:"Máximo 10:00" },
-  en: { appTitle:"Home Routines", fullBody:"Full body", generate:"Generate", filters:"Filters", selectMuscle:"Pick a muscle or use Full body", minutes:"Minutes", goal:"Goal", environment:"Environment", equipment:"Available equipment", beginner:"Beginner friendly", home:"Home", gym:"Gym", strength:"Strength", hypertrophy:"Hypertrophy", fatLoss:"Fat loss", maintenance:"Maintenance", warmup:"Warm-up", cooldown:"Cool-down", rest:"Rest", unilateral:"Unilateral", favorites:"Favorites", saveFavorite:"Save favorite", saved:"Saved", timer:"Timer", start:"Start", pause:"Pause", reset:"Reset", ready:"Done", close:"Close", timeBased:"Estimated duration", replace:"Replace", clear:"Clear", settings:"Settings", language:"Language", systemLang:"System", addExercise:"Add exercise", remove:"Remove", searchExercises:"Search exercises", createExercise:"Create exercise", patterns:"Movement patterns", unilateralQ:"Unilateral?", beginnerQ:"Beginner friendly", instructions:"Instructions", mediaURL:"Media URL (optional)", save:"Save", cancel:"Cancel", setsRepsRest:"Sets / Reps / Rest", name:"Name", email:"Email", message:"Message", send:"Send", thanksFeedback:"Thanks!", supportDev:"Support the developer", tipJar:"Tip Jar", loading:"Loading…", custom:"Custom", all:"All", use:"Use", editTime:"Edit time", max1000:"Max 10:00" }
+  es: {
+    appTitle:"Rutinas en casa", muscle:"Músculo", fullBody:"Cuerpo completo", filters:"Filtros", generate:"Generar",
+    minutes:"Minutos", goal:"Objetivo", environment:"Entorno", equipment:"Equipo disponible", beginner:"Enfocar a principiantes",
+    gym:"Gimnasio", home:"Casa", strength:"Fuerza", hypertrophy:"Hipertrofia", fatLoss:"Pérdida de grasa", maintenance:"Mantenimiento",
+    warmup:"Calentamiento", cooldown:"Vuelta a la calma", rest:"Descanso", unilateral:"Unilateral", favorites:"Favoritos",
+    saveFavorite:"Guardar en favoritos", saved:"Guardado", timer:"Temporizador", start:"Iniciar", pause:"Pausar", reset:"Reiniciar",
+    selectMuscle:"Elige un músculo o activa Cuerpo completo y presiona Generar.",
+    ready:"Listo", close:"Cerrar", timeBased:"Duración estimada",
+    replace:"Sustituir", clear:"Limpiar", settings:"Ajustes", language:"Idioma", systemLang:"Sistema",
+    addExercise:"Añadir ejercicio", remove:"Eliminar", searchExercises:"Buscar ejercicios", createExercise:"Crear ejercicio",
+    patterns:"Patrones", unilateralQ:"¿Unilateral?", beginnerQ:"Apto principiantes", instructions:"Instrucciones",
+    mediaURL:"URL multimedia (opcional)", save:"Guardar", cancel:"Cancelar", setsRepsRest:"Series / Reps / Descanso",
+    feedback:"Comentarios", name:"Nombre", email:"Correo", message:"Mensaje", send:"Enviar",
+    thanksFeedback:"Gracias por tus comentarios.",
+    supportDev:"Apoyar al desarrollador", tipJar:"Invítame un café ☕️", loading:"Cargando…", custom:"Personalizado",
+    all:"Todos", use:"Usar", editTime:"Editar tiempo", max1000:"Máximo 10:00"
+  },
+  en: {
+    appTitle:"Home Routines", muscle:"Muscle", fullBody:"Full body", filters:"Filters", generate:"Generate",
+    minutes:"Minutes", goal:"Goal", environment:"Environment", equipment:"Available equipment", beginner:"Beginner friendly",
+    gym:"Gym", home:"Home", strength:"Strength", hypertrophy:"Hypertrophy", fatLoss:"Fat loss", maintenance:"Maintenance",
+    warmup:"Warm-up", cooldown:"Cool-down", rest:"Rest", unilateral:"Unilateral", favorites:"Favorites",
+    saveFavorite:"Save favorite", saved:"Saved", timer:"Timer", start:"Start", pause:"Pause", reset:"Reset",
+    selectMuscle:"Pick a muscle or switch to Full body, then tap Generate.",
+    ready:"Done", close:"Close", timeBased:"Estimated duration",
+    replace:"Replace", clear:"Clear", settings:"Settings", language:"Language", systemLang:"System",
+    addExercise:"Add exercise", remove:"Remove", searchExercises:"Search exercises", createExercise:"Create exercise",
+    patterns:"Movement patterns", unilateralQ:"Unilateral?", beginnerQ:"Beginner friendly", instructions:"Instructions",
+    mediaURL:"Media URL (optional)", save:"Save", cancel:"Cancel", setsRepsRest:"Sets / Reps / Rest",
+    feedback:"Feedback", name:"Name", email:"Email", message:"Message", send:"Send",
+    thanksFeedback:"Thanks for your feedback.",
+    supportDev:"Support the developer", tipJar:"Tip Jar ☕️", loading:"Loading…", custom:"Custom",
+    all:"All", use:"Use", editTime:"Edit time", max1000:"Max 10:00"
+  }
 };
-function t(k){ return I18N[LANG][k] || k; }
+// por defecto español
+const Lang = {
+  key:"app_lang_v1",
+  get(){ const raw=localStorage.getItem(this.key)||"es"; return raw==="system" ? ((navigator.language||"en").toLowerCase().startsWith("es")?"es":"en") : raw; },
+  set(v){ localStorage.setItem(this.key,v); }
+};
+let L = I18N[Lang.get()];
+function t(k){ return (L[k] ?? k); }
+function applyStaticI18n(){ document.querySelectorAll("[data-i]").forEach(n => n.textContent = t(n.dataset.i)); }
+const $ = sel => document.querySelector(sel);
 
-/* ====== Domain enums ====== */
-const Env = {home:"home", gym:"gym"};
+/* ===================== Domain ===================== */
+const Env = { home:"home", gym:"gym" };
 const Equip = { bodyweight:"bodyweight", dumbbells:"dumbbells", kettlebell:"kettlebell", barbell:"barbell", bench:"bench", bands:"bands", cable:"cable", machine:"machine", smith:"smith" };
 const Muscles = ["chest","back","quads","hamstrings","glutes","shoulders","biceps","triceps","calves","core"];
-const Pattern = { horizontalPush:"horizontalPush", verticalPush:"verticalPush", horizontalPull:"horizontalPull", verticalPull:"verticalPull", kneeDominant:"kneeDominant", hipHinge:"hipHinge", elbowFlexion:"elbowFlexion", elbowExtension:"elbowExtension", abAntiExtension:"abAntiExtension", abAntiRotation:"abAntiRotation", abFlexion:"abFlexion", abLateralFlexion:"abLateralFlexion", calfRaise:"calfRaise" };
+const Pattern = { horizontalPush:"horizontalPush", verticalPush:"verticalPush", horizontalPull:"horizontalPull", verticalPull:"verticalPull",
+  kneeDominant:"kneeDominant", hipHinge:"hipHinge", elbowFlexion:"elbowFlexion", elbowExtension:"elbowExtension",
+  abAntiExtension:"abAntiExtension", abAntiRotation:"abAntiRotation", abFlexion:"abFlexion", abLateralFlexion:"abLateralFlexion", calfRaise:"calfRaise" };
 const Goal = { strength:"strength", hypertrophy:"hypertrophy", fatLoss:"fatLoss", maintenance:"maintenance" };
 
-/* Titles */
-const MUSCLE_T = {
-  es:{chest:"Pecho",back:"Espalda",quads:"Cuádriceps",hamstrings:"Isquios",glutes:"Glúteos",shoulders:"Hombros",biceps:"Bíceps",triceps:"Tríceps",calves:"Pantorrillas",core:"Core"},
-  en:{chest:"Chest",back:"Back",quads:"Quads",hamstrings:"Hamstrings",glutes:"Glutes",shoulders:"Shoulders",biceps:"Biceps",triceps:"Triceps",calves:"Calves",core:"Core"}
-};
-const EQUIP_T = {
-  es:{bodyweight:"Peso corporal",dumbbells:"Mancuernas",kettlebell:"Pesa rusa",barbell:"Barra",bench:"Banco",bands:"Ligas",cable:"Poleas",machine:"Máquina",smith:"Multipower (Smith)"},
-  en:{bodyweight:"Bodyweight",dumbbells:"Dumbbells",kettlebell:"Kettlebell",barbell:"Barbell",bench:"Bench",bands:"Bands",cable:"Cables",machine:"Machine",smith:"Smith machine"}
-};
-const PATTERN_T = {
-  es:{horizontalPush:"Empuje horizontal",verticalPush:"Empuje vertical",horizontalPull:"Tracción horizontal",verticalPull:"Tracción vertical",kneeDominant:"Dominante rodilla",hipHinge:"Bisagra cadera",elbowFlexion:"Flexión codo",elbowExtension:"Extensión codo",abAntiExtension:"Anti-extensión",abAntiRotation:"Anti-rotación",abFlexion:"Flexión abdominal",abLateralFlexion:"Flexión lateral",calfRaise:"Pantorrilla"},
-  en:{horizontalPush:"Horizontal push",verticalPush:"Vertical push",horizontalPull:"Horizontal pull",verticalPull:"Vertical pull",kneeDominant:"Knee dominant",hipHinge:"Hip hinge",elbowFlexion:"Elbow flexion",elbowExtension:"Elbow extension",abAntiExtension:"Anti-extension",abAntiRotation:"Anti-rotation",abFlexion:"Ab flexion",abLateralFlexion:"Lateral flexion",calfRaise:"Calf raise"}
-};
-const mTitle = m => MUSCLE_T[LANG][m];
-const eTitle = e => (EQUIP_T[LANG][e]||e);
-const pTitle = p => (PATTERN_T[LANG][p]||p);
+function mTitle(m){
+  const es = {chest:"Pecho",back:"Espalda",quads:"Cuádriceps",hamstrings:"Isquios",glutes:"Glúteos",shoulders:"Hombros",biceps:"Bíceps",triceps:"Tríceps",calves:"Pantorrillas",core:"Core"};
+  const en = {chest:"Chest",back:"Back",quads:"Quads",hamstrings:"Hamstrings",glutes:"Glutes",shoulders:"Shoulders",biceps:"Biceps",triceps:"Triceps",calves:"Calves",core:"Core"};
+  return (Lang.get()==="es"?es:en)[m];
+}
+function equipTitle(e){
+  const es = {bodyweight:"Peso corporal",dumbbells:"Mancuernas",kettlebell:"Pesa rusa",barbell:"Barra",bench:"Banco",bands:"Ligas",cable:"Poleas",machine:"Máquina",smith:"Multipower (Smith)"};
+  const en = {bodyweight:"Bodyweight",dumbbells:"Dumbbells",kettlebell:"Kettlebell",barbell:"Barbell",bench:"Bench",bands:"Bands",cable:"Cables",machine:"Machine",smith:"Smith machine"};
+  return (Lang.get()==="es"?es:en)[e] || e;
+}
 
-/* Storage */
-const Store = {
-  get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{return def;} },
+/* ===================== Storage ===================== */
+const Storage = {
+  get(k, def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch{ return def; } },
   set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
 };
-const CustomKey = "custom_exercises_v1";
-const FavKey    = "favorite_plans_v2";
+const CustomStoreKey = "custom_exercises_v1";
+const FavoriteKey = "favorite_plans_v2";
+const CustomStore = { list(){ return Storage.get(CustomStoreKey,[]); }, add(ex){const a=this.list(); a.unshift(ex); Storage.set(CustomStoreKey,a);} };
+const Favorites = { list(){ return Storage.get(FavoriteKey,[]); }, add(p){ const a=this.list(); a.unshift(p); Storage.set(FavoriteKey,a); }, removeAt(i){ const a=this.list(); a.splice(i,1); Storage.set(FavoriteKey,a);} };
 
-/* Defaults */
+/* ===================== Defaults ===================== */
 const TrainingDefaults = {
-  targetExercises(duration, fullBody){ if(duration<30) return fullBody?3:2; if(duration<45) return fullBody?4:3; if(duration<60) return fullBody?5:4; if(duration<90) return fullBody?6:5; return fullBody?6:6; },
-  sets(goal, duration){ switch(goal){ case Goal.strength: return duration<40?3:4; case Goal.hypertrophy: return duration<40?3:4; case Goal.fatLoss: return 3; case Goal.maintenance: return 3; } },
+  targetExercises(d, fb){ if(d<30) return fb?3:2; if(d<45) return fb?4:3; if(d<60) return fb?5:4; if(d<90) return fb?6:5; return fb?6:6; },
+  sets(goal,d){ switch(goal){ case Goal.strength: return d<40?3:4; case Goal.hypertrophy: return d<40?3:4; case Goal.fatLoss: return 3; case Goal.maintenance: return 3; } },
   repRange(goal){ switch(goal){ case Goal.strength: return [4,6]; case Goal.hypertrophy: return [8,12]; case Goal.fatLoss: return [12,20]; case Goal.maintenance: return [8,12]; } },
   rest(goal){ switch(goal){ case Goal.strength: return 120; case Goal.hypertrophy: return 90; case Goal.fatLoss: return 60; case Goal.maintenance: return 75; } }
 };
 
-/* VM state */
-let EXERCISES = [];      // from JSON + custom
-let Filters = { environment:Env.home, allowedEquipment:new Set(Object.values(Equip)), minutes:30, preferBeginner:true, goal:Goal.hypertrophy, fullBody:false };
+// Estado VM (con tus defaults pedidos)
+let EXERCISES = []; // ejercicios base + custom
+let Filters = {
+  environment: Env.home,
+  // Todo activo MENOS poleas/cable, máquina y smith:
+  allowedEquipment: new Set(Object.values(Equip).filter(e => !["cable","machine","smith"].includes(e))),
+  minutes: 30,
+  preferBeginner: false, // principiantes APAGADO
+  goal: Goal.hypertrophy,
+  fullBody: false
+};
 let selectedMuscle = null;
 let currentPlan = null;
 
-/* Utils */
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const makeId = () => (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+"-"+Math.random()));
-function shuffle(a){ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]];} return x; }
-function toast(msg){ const box=$("#toast"); box.textContent=msg; box.hidden=false; setTimeout(()=>box.hidden=true,1200); }
+/* ===================== Helpers ===================== */
+const makeId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`);
+const el = html => { const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; };
+const showModal = id => { $("#backdrop").classList.add("show"); $("#"+id).classList.add("show"); };
+const closeModals = () => { $("#backdrop").classList.remove("show"); document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show")); };
+$("#backdrop").onclick = closeModals;
+const shuffle = a => { const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]];} return x; };
+const norm = s => (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 
-/* --------- DATA LOAD --------- */
+/* ===================== Exercise Library (subset + fetch externo) ===================== */
+function addEx(list, n,m,p,eq,env,uni,beg,ins,v,media=null){
+  list.push({id:makeId(), name:n, muscle:m, patterns:p, equipment:eq, environment:env, unilateral:uni, beginnerFriendly:beg, instructions:ins, variant:v, mediaURL:media});
+}
+function builtInLibrary(){
+  const H = (Lang.get()==="es");
+  const s = (es,en)=> H?es:en;
+  const L=[];
+  // Chest
+  [["Flexiones","Push-ups","chest_pushup",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Manos bajo hombros, cuerpo en línea.","Hands under shoulders, body in line.")],
+   ["Press plano con mancuernas","DB Flat Press","chest_mid_db",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],false,true,s("Escápulas retraídas, 2s abajo/1s arriba.","Scap retracted, 2s down/1s up.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "chest", ["horizontalPush"], eq, env, uni, beg, ins, v));
+  // Back
+  [["Remo mancuerna un brazo","One-arm DB Row","back_row_db_one",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],true,true,s("Tracción hacia la cadera, sin balanceo.","Row to hip, no swing.")],
+   ["Remo con barra","Barbell Row","back_row_bb",[Equip.barbell],[Env.home,Env.gym],false,false,s("Torso 30–45°, columna neutra.","Torso 30–45°, neutral.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "back", ["horizontalPull"], eq, env, uni, beg, ins, v));
+  // Quads
+  [["Sentadilla goblet","Goblet Squat","quads_goblet",[Equip.dumbbells,Equip.kettlebell],[Env.home,Env.gym],false,true,s("Rodillas siguen puntas.","Knees track toes.")],
+   ["Split squat búlgaro","Bulgarian Split Squat","quads_bulgarian",[Equip.dumbbells,Equip.bench],[Env.home,Env.gym],true,true,s("Controla la bajada.","Control descent.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "quads", ["kneeDominant"], eq, env, uni, beg, ins, v));
+  // Hams
+  [["Peso muerto rumano DB","DB RDL","hams_rdl_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Cadera atrás, columna neutra.","Hips back, neutral.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "hamstrings", ["hipHinge"], eq, env, uni, beg, ins, v));
+  // Glutes
+  [["Glute bridge","Glute Bridge","glutes_bridge_bw",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Empuja desde talones.","Drive through heels.")],
+   ["Hip thrust en banco","Bench Hip Thrust","glutes_hipthrust_bench",[Equip.bench,Equip.dumbbells],[Env.home,Env.gym],false,true,s("Retroversión arriba.","Posterior tilt at top.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "glutes", ["hipHinge"], eq, env, uni, beg, ins, v));
+  // Shoulders
+  [["Press militar DB","DB Overhead Press","shoulders_press_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Core firme.","Brace core.")],
+   ["Elevación lateral","Lateral Raise","shoulders_lateral",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Sin impulso.","No swing.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "shoulders", ["verticalPush"], eq, env, uni, beg, ins, v));
+  // Biceps / Triceps / Core / Calves
+  [["Curl DB supinado","DB Curl (supinated)","biceps_curl_db",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Codo quieto.","Elbow still.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "biceps", ["elbowFlexion"], eq, env, uni, beg, ins, v));
+  [["Extensión DB sobre cabeza","DB Overhead Triceps","triceps_db_oh",[Equip.dumbbells],[Env.home,Env.gym],false,true,s("Codos fijos.","Elbows fixed.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "triceps", ["elbowExtension"], eq, env, uni, beg, ins, v));
+  [["Plancha frontal","Front Plank","core_plank",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Costillas adentro.","Ribs down.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "core", ["abAntiExtension"], eq, env, uni, beg, ins, v));
+  [["Elevación talones de pie","Standing Calf Raise","calves_standing",[Equip.bodyweight],[Env.home,Env.gym],false,true,s("Pausa 1s arriba.","1s top pause.")]]
+   .forEach(([es,en,v,eq,env,uni,beg,ins])=> addEx(L, s(es,en), "calves", ["calfRaise"], eq, env, uni, beg, ins, v));
+
+  return L;
+}
 async function loadExercises(){
   try{
-    const res = await fetch("exercises.json",{cache:"no-store"});
-    const base = await res.json();
-    const custom = Store.get(CustomKey, []);
-    EXERCISES = base.concat(custom);
-  }catch(e){
-    EXERCISES = Store.get(CustomKey, []); // fallback only custom
+    const res = await fetch("exercises.json?v=3", {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const json = await res.json();
+    return json.concat(CustomStore.list());
+  }catch{
+    return builtInLibrary().concat(CustomStore.list());
   }
 }
 
-/* --------- FILTERING & GENERATION --------- */
+/* ===================== Generator ===================== */
 function pool(muscle){
   return EXERCISES.filter(ex =>
     ex.environment.includes(Filters.environment) &&
-    ex.equipment.every(eq=>Filters.allowedEquipment.has(eq)) &&
+    ex.equipment.every(e => Filters.allowedEquipment.has(e)) &&
     (Filters.preferBeginner ? ex.beginnerFriendly : true) &&
-    (muscle ? ex.muscle===muscle : true)
+    (muscle ? ex.muscle === muscle : true)
   );
 }
 function alternatives(ex){
   const all = pool(ex.muscle).filter(e=>e.id!==ex.id);
   const sameVariant = all.filter(e=>e.variant===ex.variant);
   if(sameVariant.length) return shuffle(sameVariant);
-  const samePattern = all.filter(e=>e.patterns.some(p=>ex.patterns.includes(p)));
-  return (samePattern.length?shuffle(samePattern):shuffle(all));
+  const samePattern = all.filter(e=>e.patterns.some(p => ex.patterns.includes(p)));
+  return samePattern.length ? shuffle(samePattern) : shuffle(all);
 }
 function generate(){
   const p = shuffle(pool(Filters.fullBody?null:selectedMuscle));
@@ -102,510 +185,516 @@ function generate(){
   const rest = TrainingDefaults.rest(Filters.goal);
   const wanted = [Pattern.horizontalPush,Pattern.horizontalPull,Pattern.kneeDominant,Pattern.hipHinge,Pattern.abAntiExtension];
 
-  let chosen=[];
+  let chosen = [];
   if(Filters.fullBody){
     for(const pat of wanted){
-      const pick = p.find(e=>e.patterns.includes(pat) && !chosen.includes(e));
+      const pick = p.find(e => e.patterns.includes(pat) && !chosen.includes(e));
       if(pick) chosen.push(pick);
-      if(chosen.length===count) break;
+      if(chosen.length === count) break;
     }
   }
-  while(chosen.length<count){
-    const next = p.find(e=>!chosen.includes(e)); if(!next) break; chosen.push(next);
+  while(chosen.length < count){
+    const next = p.find(e => !chosen.includes(e));
+    if(!next) break;
+    chosen.push(next);
   }
   if(!chosen.length && p.length) chosen=[p[0]];
 
-  const items = chosen.map(ex=>({
+  const items = chosen.map(ex => ({
     id: makeId(),
     exercise: ex,
-    sets, reps:[rmin,rmax], restSeconds: rest,
-    notes: ex.unilateral ? (LANG==="es" ? "Trabaja ambos lados. RPE 7–8." : "Work both sides. RPE 7–8.") : (LANG==="es" ? "RPE 7–8." : "RPE 7–8.")
+    sets,
+    reps: [rmin,rmax],
+    restSeconds: rest,
+    notes: ex.unilateral ? (Lang.get()==="es" ? "Trabaja ambos lados. RPE 7–8." : "Work both sides. RPE 7–8.") : (Lang.get()==="es" ? "RPE 7–8." : "RPE 7–8.")
   }));
 
-  const warm = LANG==="es" ? "5–7 min movilidad + 2 series ligeras del primer ejercicio." : "5–7 min mobility + 2 light ramp-up sets.";
-  const cool = LANG==="es" ? "3–5 min respiración nasal + estiramientos suaves." : "3–5 min nasal breathing + gentle stretches.";
+  const warm = Lang.get()==="es" ? "5–7 min movilidad + 2 series ligeras del primer ejercicio." : "5–7 min mobility + 2 light ramp-up sets.";
+  const cool = Lang.get()==="es" ? "3–5 min respiración nasal + estiramientos suaves." : "3–5 min nasal breathing + gentle stretches.";
 
-  currentPlan = { id:makeId(), muscle: Filters.fullBody?null:selectedMuscle, goal:Filters.goal, durationMinutes:Filters.minutes, items, warmup:warm, cooldown:cool, createdAt: Date.now() };
-  render();
+  currentPlan = {
+    id: makeId(),
+    muscle: Filters.fullBody ? null : selectedMuscle,
+    goal: Filters.goal,
+    durationMinutes: Filters.minutes,
+    items,
+    warmup: warm,
+    cooldown: cool,
+    createdAt: Date.now()
+  };
+  renderAll();
 }
 
-/* --------- RENDER --------- */
+/* ===================== Render ===================== */
 function renderHeader(){
   $("#appTitle").textContent = t("appTitle");
   $("#subtitle").textContent = t("selectMuscle");
 }
 function renderMuscleChips(){
-  const c = $("#muscleChips"); c.innerHTML="";
+  const c = $("#muscleChips");
+  c.innerHTML = "";
   const full = document.createElement("button");
   full.className = "chip"+(Filters.fullBody?" active":"");
   full.textContent = t("fullBody");
-  full.onclick = () => { Filters.fullBody=!Filters.fullBody; if(Filters.fullBody) selectedMuscle=null; render(); };
+  full.onclick = () => { Filters.fullBody = !Filters.fullBody; if(Filters.fullBody) selectedMuscle = null; renderAll(); };
   c.appendChild(full);
+
   for(const m of Muscles){
     const b = document.createElement("button");
     b.className = "chip"+((selectedMuscle===m && !Filters.fullBody)?" active":"");
     b.textContent = mTitle(m);
-    b.onclick = () => { Filters.fullBody=false; selectedMuscle=m; render(); };
+    b.onclick = () => { Filters.fullBody = false; selectedMuscle = m; renderAll(); };
     c.appendChild(b);
   }
 }
+function flashSaved(){
+  const n = el(`<div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#00dc82;color:#000;border-radius:999px;padding:8px 14px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.3)">✅ ${t('saved')}</div>`);
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(),1200);
+}
 function renderContent(){
-  const root = $("#content"); root.innerHTML="";
+  const root = $("#content");
+  root.innerHTML = "";
+
   if(!currentPlan){
-    root.appendChild(el(`<div class="empty"><div><div style="font-size:56px">💪</div><div>${t("selectMuscle")}</div></div></div>`));
+    root.appendChild(el(`<div class="empty">
+      <div>
+        <div style="font-size:56px;line-height:1">🏋️</div>
+        <div>${t('selectMuscle')}</div>
+      </div>
+    </div>`));
     return;
   }
-  // Head
+
+  // Encabezado del plan
   root.appendChild(el(`<div class="card">
     <div class="row">
       <div>
-        <div class="item-title">${currentPlan.muscle?mTitle(currentPlan.muscle):t("fullBody")}</div>
-        <div class="caption">${t(currentPlan.goal)} • ${currentPlan.durationMinutes} ${t("minutes").toLowerCase()}</div>
+        <div style="font-weight:700">${currentPlan.muscle?mTitle(currentPlan.muscle):t('fullBody')}</div>
+        <div class="caption">${t(currentPlan.goal)} • ${currentPlan.durationMinutes} ${t('minutes').toLowerCase()}</div>
       </div>
     </div>
   </div>`));
 
-  // Warmup
-  root.appendChild(el(`<div class="card"><div class="row"><div><strong>${t("warmup")}</strong><div class="caption">${currentPlan.warmup}</div></div></div></div>`));
+  // Calentamiento
+  root.appendChild(el(`<div class="card"><div class="group"><h3>${t('warmup')}</h3><div class="caption">${currentPlan.warmup}</div></div></div>`));
 
-  // Items
+  // Ejercicios
   currentPlan.items.forEach((item, idx) => {
-    const card = el(`
-      <div class="card" data-item-id="${item.id}">
-        <div class="row">
-          <div style="max-width:64%">
-            <div class="item-title">${item.exercise.name}</div>
-            <div class="caption">${item.exercise.instructions||""}</div>
-          </div>
-          <div class="item-actions">
-            <span class="badge">${item.sets}×${item.reps[0]}–${item.reps[1]}</span>
-            <button class="btn small" data-act="replace">${t("replace")}</button>
-            <button class="btn small" data-act="remove">${t("remove")}</button>
-          </div>
+    const card = el(`<div class="card">
+      <div class="row">
+        <div style="max-width:60%">
+          <div style="font-weight:700">${item.exercise.name}</div>
+          <div class="caption">${item.exercise.instructions}</div>
         </div>
-        <div class="row" style="margin-top:8px">
-          <div class="caption">⏱ ${t("rest")} ${item.restSeconds}s ${item.exercise.unilateral?`• ${t("unilateral")}`:""}</div>
-          <div class="timer">
-            <span class="time" data-time title="${t("editTime")}">${formatTime(item.restSeconds)}</span>
-            <button class="btn small primary" data-act="start">${t("start")}</button>
-            <button class="btn small" data-act="pause">${t("pause")}</button>
-            <button class="btn small" data-act="reset">${t("reset")}</button>
-            <button class="btn small" data-act="gif">GIF</button>
-          </div>
+        <div class="row-right">
+          <div class="caption">${item.sets}×${item.reps[0]}–${item.reps[1]}</div>
+          <button class="btn secondary small" data-act="replace">${t('replace')}</button>
+          <button class="btn secondary small" data-act="remove">${t('remove')}</button>
         </div>
       </div>
-    `);
+      <div class="row" style="margin-top:6px">
+        <div class="caption">⏱ ${t('rest')} ${item.restSeconds}s ${item.exercise.unilateral?` • 🔁 ${t('unilateral')}`:""}</div>
+        <div class="timer">
+          <span class="time" data-time>0:00</span>
+          <button class="btn primary small" data-act="start">${t('start')}</button>
+          <button class="btn secondary small" data-act="pause">${t('pause')}</button>
+          <button class="btn secondary small" data-act="reset">${t('reset')}</button>
+          <button class="btn secondary small" data-act="gif">GIF</button>
+        </div>
+      </div>
+    </div>`);
+
+    // ---- Timer ----
+    const timeEl = card.querySelector("[data-time]");
+    let remaining = item.restSeconds, running=false, int=null;
+
+    function fmt(s){ const m=Math.floor(s/60), r=s%60; return `${m}:${r.toString().padStart(2,"0")}`; }
+    function draw(){ timeEl.textContent = fmt(remaining); }
+    function start(){
+      if(running) return;
+      running = true;
+      if(remaining<=0) remaining = item.restSeconds;
+      int = setInterval(()=>{
+        if(!running) return;
+        remaining--;
+        draw();
+        if(remaining<=0){ running=false; clearInterval(int); if(navigator.vibrate) navigator.vibrate(100); }
+      },1000);
+    }
+    function pause(){ running=false; clearInterval(int); }
+    function reset(){ running=false; clearInterval(int); remaining=item.restSeconds; draw(); }
+
+    // editar tocando el tiempo
+    timeEl.style.cursor="pointer";
+    timeEl.title = t("editTime");
+    timeEl.onclick = ()=>{
+      const cur = remaining || item.restSeconds;
+      const raw = prompt(Lang.get()==="es" ? "Segundos (1–600):" : "Seconds (1–600):", String(cur));
+      if(!raw) return;
+      let v = parseInt(raw,10);
+      if(isNaN(v)) return;
+      v = Math.max(1, Math.min(600, v));
+      item.restSeconds = v;
+      remaining = v;
+      draw();
+    };
+
+    draw();
+    card.querySelector('[data-act="start"]').onclick = start;
+    card.querySelector('[data-act="pause"]').onclick = pause;
+    card.querySelector('[data-act="reset"]').onclick = reset;
+    card.querySelector('[data-act="gif"]').onclick = ()=>{
+      const q = encodeURIComponent(`${item.exercise.name} exercise gif`);
+      window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`,"_blank","noopener");
+    };
+
+    // ---- Replace / Remove ----
+    card.querySelector('[data-act="replace"]').onclick = () => {
+      const alt = alternatives(item.exercise)[0];
+      if(!alt) return;
+      currentPlan.items[idx] = { ...item, exercise: alt };
+      renderAll();
+    };
+    card.querySelector('[data-act="remove"]').onclick = () => {
+      currentPlan.items.splice(idx,1);
+      renderAll();
+    };
+
+    // tap en cabecera abre GIF también
+    card.querySelector(".row").onclick = (e)=>{
+      if(e.target.closest("button")) return; // no si fue botón
+      const q = encodeURIComponent(`${item.exercise.name} exercise gif`);
+      window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`,"_blank","noopener");
+    };
+
     root.appendChild(card);
   });
 
-  // Cooldown **antes** de los botones (para que “Vuelta a la calma” quede al final de la rutina)
-  root.appendChild(el(`<div class="card"><div class="row"><div><strong>${t("cooldown")}</strong><div class="caption">${currentPlan.cooldown}</div></div></div></div>`));
-
-  // Buttons
-  const actions = el(`
-    <div class="card">
-      <div class="grid cols-3">
-        <button class="btn primary" id="addEx">＋ ${t("addExercise")}</button>
-        <button class="btn" id="saveFav">❤️ ${t("saveFavorite")}</button>
-        <button class="btn danger" id="clearPlan">🗑️ ${t("clear")}</button>
-      </div>
+  // Barra de acciones (antes del cooldown)
+  const actions = el(`<div class="card">
+    <div class="grid cols3" style="margin-top:4px">
+      <button class="btn primary" id="addEx">＋ ${t('addExercise')}</button>
+      <button class="btn secondary" id="saveFav">❤️ ${t('saveFavorite')}</button>
+      <button class="btn danger" id="clearPlan">🗑️ ${t('clear')}</button>
     </div>
-  `);
+  </div>`);
   root.appendChild(actions);
+
+  // Cooldown (al final)
+  root.appendChild(el(`<div class="card"><div class="group"><h3>${t('cooldown')}</h3><div class="caption">${currentPlan.cooldown}</div></div></div>`));
+
+  // handlers de acciones
+  $("#addEx").onclick = openPicker;
+  $("#saveFav").onclick = () => { Favorites.add(currentPlan); flashSaved(); };
+  $("#clearPlan").onclick = () => { currentPlan = null; renderAll(); };
 }
-
-/* Event delegation on content (fixes replace/remove reliability) */
-$("#content").addEventListener("click", (ev)=>{
-  const btn = ev.target.closest("[data-act]"); if(!btn) return;
-  const card = ev.target.closest("[data-item-id]"); if(!card) return;
-  const id = card.getAttribute("data-item-id");
-  const idx = currentPlan.items.findIndex(it => it.id === id);
-  if(idx < 0) return;
-
-  const action = btn.getAttribute("data-act");
-  const item = currentPlan.items[idx];
-
-  if(action === "replace"){
-    const alt = alternatives(item.exercise)[0]; if(!alt) return;
-    currentPlan.items[idx] = {...item, exercise: alt};
-    render();
-  }
-  if(action === "remove"){
-    currentPlan.items.splice(idx, 1); render();
-  }
-  if(action === "gif"){
-    const q = encodeURIComponent(`${item.exercise.name} exercise gif`);
-    // abrir en nueva pestaña, más fiable en iOS
-    window.open(`https://duckduckgo.com/?q=${q}&iax=images&ia=images`, "_blank", "noopener");
-  }
-  if(action === "start"){
-    startTimer(card, item);
-  }
-  if(action === "pause"){
-    pauseTimer(card);
-  }
-  if(action === "reset"){
-    resetTimer(card, item.restSeconds);
-  }
-});
-
-/* Editable time by tapping the time label */
-$("#content").addEventListener("click", (ev)=>{
-  const timeEl = ev.target.closest("[data-time]"); if(!timeEl) return;
-  const card = ev.target.closest("[data-item-id]");
-  const id = card.getAttribute("data-item-id");
-  const item = currentPlan.items.find(it=>it.id===id);
-  if(!item) return;
-  const cur = parseTimeToSec(timeEl.textContent) || item.restSeconds;
-  const user = prompt(`${t("rest")} (s)`, cur);
-  if(user==null) return;
-  const sec = Math.min(600, Math.max(1, parseInt(user,10)||cur));
-  timeEl.textContent = formatTime(sec);
-  // If timer is running, reset to new value
-  resetTimer(card, sec);
-});
-
-/* Timers per-card */
-const runningTimers = new Map(); // cardEl -> {remaining, interval}
-function formatTime(s){ const m=Math.floor(s/60), r=s%60; return `${m}:${String(r).padStart(2,"0")}`; }
-function parseTimeToSec(str){
-  const m = String(str).trim().split(":"); if(m.length!==2) return NaN;
-  const mm = parseInt(m[0],10), ss=parseInt(m[1],10);
-  return (isNaN(mm)||isNaN(ss))?NaN:(mm*60+ss);
+function renderAll(){
+  L = I18N[Lang.get()];
+  applyStaticI18n();
+  renderHeader();
+  renderMuscleChips();
+  $("#generate").disabled = (!Filters.fullBody && !selectedMuscle);
+  renderContent();
 }
-function startTimer(card, item){
-  const timeEl = card.querySelector("[data-time]");
-  let cur = parseTimeToSec(timeEl.textContent) || item.restSeconds;
-  // avoid duplicate intervals
-  if(runningTimers.has(card)) clearInterval(runningTimers.get(card).interval);
-  const interval = setInterval(()=>{
-    cur--; timeEl.textContent = formatTime(Math.max(0, cur));
-    if(cur<=0){ clearInterval(interval); runningTimers.delete(card); if(navigator.vibrate) navigator.vibrate(100); }
-  },1000);
-  runningTimers.set(card,{interval});
-}
-function pauseTimer(card){
-  if(!runningTimers.has(card)) return;
-  clearInterval(runningTimers.get(card).interval);
-  runningTimers.delete(card);
-}
-function resetTimer(card, seconds){
-  pauseTimer(card);
-  const timeEl = card.querySelector("[data-time]");
-  timeEl.textContent = formatTime(seconds);
-}
+// Alias por si algún handler usa render()
+function render(){ renderAll(); }
 
-/* --------- SHEETS --------- */
-const backdrop = $("#backdrop");
-function openSheet(el){ backdrop.hidden=false; el.hidden=false; }
-function closeSheets(){ backdrop.hidden=true; $$(".sheet").forEach(s=>s.hidden=true); }
-backdrop.addEventListener("click", closeSheets);
-
-/* Filters sheet (re-diseñada) */
+/* ===================== Filtros ===================== */
 function openFilters(){
-  const el = $("#filtersModal");
-  const eq = Object.values(Equip).map(e=>`
-    <label><input type="checkbox" data-eq="${e}" ${Filters.allowedEquipment.has(e)?"checked":""}> ${eTitle(e)}</label>
-  `).join("");
-
-  el.innerHTML = `
-    <div class="header">
-      <h3>🎚️ ${t("filters")}</h3>
-      <button class="btn small" id="f_close">✖️ ${t("close")}</button>
-    </div>
-    <div class="grid cols-2">
+  const m = $("#filtersModal");
+  const eqList = Object.values(Equip).map(e=>`
+    <label><input type="checkbox" data-eq="${e}" ${Filters.allowedEquipment.has(e)?"checked":""}> ${equipTitle(e)}</label>
+  `).join('<br>');
+  m.innerHTML = `
+    <div class="sticky"><h3 style="margin:0">${t('filters')}</h3></div>
+    <div class="grid cols2">
       <div>
-        <label>${t("goal")}</label>
+        <label>${t('goal')}</label>
         <select id="f_goal">
-          <option value="strength">${t("strength")}</option>
-          <option value="hypertrophy">${t("hypertrophy")}</option>
-          <option value="fatLoss">${t("fatLoss")}</option>
-          <option value="maintenance">${t("maintenance")}</option>
+          <option value="strength">${t('strength')}</option>
+          <option value="hypertrophy">${t('hypertrophy')}</option>
+          <option value="fatLoss">${t('fatLoss')}</option>
+          <option value="maintenance">${t('maintenance')}</option>
         </select>
       </div>
       <div>
-        <label>${t("environment")}</label>
+        <label>${t('environment')}</label>
         <select id="f_env">
-          <option value="home">${t("home")}</option>
-          <option value="gym">${t("gym")}</option>
+          <option value="home">${t('home')}</option>
+          <option value="gym">${t('gym')}</option>
         </select>
       </div>
     </div>
-
-    <div style="margin-top:8px">
-      <label>${t("minutes")}: <strong id="minsVal">${Filters.minutes}</strong></label>
-      <input class="input" type="range" min="20" max="120" step="5" id="f_minutes" value="${Filters.minutes}">
-      <div class="caption">${t("timeBased")}</div>
+    <div class="group">
+      <label>${t('minutes')}: <span id="minsVal">${Filters.minutes}</span></label>
+      <input type="range" min="20" max="120" step="5" id="f_minutes" value="${Filters.minutes}">
+      <div class="caption">${t('timeBased')}</div>
     </div>
-
-    <div class="grid" style="margin-top:10px">
-      <label>${t("equipment")}</label>
-      <div class="grid cols-3">${eq}</div>
+    <div class="group">
+      <label>${t('equipment')}</label>
+      <div class="grid">${eqList}</div>
     </div>
-
-    <div class="grid cols-2" style="margin:10px 0">
-      <label><input type="checkbox" id="f_beg" ${Filters.preferBeginner?"checked":""}> ${t("beginner")}</label>
-      <label><input type="checkbox" id="f_full" ${Filters.fullBody?"checked":""}> ${t("fullBody")}</label>
+    <div class="group grid cols2">
+      <label><input type="checkbox" id="f_beg" ${Filters.preferBeginner?"checked":""}> ${t('beginner')}</label>
+      <label><input type="checkbox" id="f_full" ${Filters.fullBody?"checked":""}> ${t('fullBody')}</label>
     </div>
-
-    <div class="grid cols-2" style="margin-top:12px">
-      <button class="btn ghost" id="f_cancel">✖️ ${t("close")}</button>
-      <button class="btn primary" id="f_apply">✅ ${t("ready")}</button>
+    <div class="grid cols2">
+      <button class="btn secondary" id="f_close">✖️ ${t('close')}</button>
+      <button class="btn primary" id="f_ready">✅ ${t('ready')}</button>
     </div>
   `;
+  m.querySelector('#f_goal').value = Filters.goal;
+  m.querySelector('#f_env').value = Filters.environment;
+  m.querySelector('#f_minutes').oninput = e => m.querySelector('#minsVal').textContent = e.target.value;
+  m.querySelector('#f_close').onclick = closeModals;
+  m.querySelector('#f_ready').onclick = ()=>{
+    Filters.goal = m.querySelector('#f_goal').value;
+    Filters.environment = m.querySelector('#f_env').value;
+    Filters.minutes = parseInt(m.querySelector('#f_minutes').value,10);
+    Filters.preferBeginner = m.querySelector('#f_beg').checked;
+    Filters.fullBody = m.querySelector('#f_full').checked;
 
-  el.querySelector("#f_goal").value = Filters.goal;
-  el.querySelector("#f_env").value = Filters.environment;
-  el.querySelector("#f_minutes").oninput = e => el.querySelector("#minsVal").textContent = e.target.value;
-  el.querySelector("#f_cancel").onclick = closeSheets;
-  el.querySelector("#f_close").onclick  = closeSheets;
-  el.querySelector("#f_apply").onclick = ()=>{
-    Filters.goal = el.querySelector("#f_goal").value;
-    Filters.environment = el.querySelector("#f_env").value;
-    Filters.minutes = parseInt(el.querySelector("#f_minutes").value,10);
-    Filters.preferBeginner = el.querySelector("#f_beg").checked;
-    Filters.fullBody = el.querySelector("#f_full").checked;
-    const set = new Set([...el.querySelectorAll("[data-eq]")].filter(i=>i.checked).map(i=>i.dataset.eq));
-    Filters.allowedEquipment = set.size?set:new Set(Object.values(Equip));
-    closeSheets(); render();
+    const inputs = [...m.querySelectorAll('[data-eq]')];
+    const set = new Set();
+    inputs.forEach(inp => { if(inp.checked) set.add(inp.dataset.eq); });
+    Filters.allowedEquipment = set.size ? set : new Set(Object.values(Equip));
+
+    closeModals();
+    renderAll();
   };
-
-  openSheet(el);
+  showModal('filtersModal');
 }
 
-/* Picker sheet */
+/* ===================== Picker (añadir ejercicios) ===================== */
 function openPicker(){
-  const el = $("#pickerModal");
-  let q=""; let muscleFilter = selectedMuscle || null;
+  const m = $("#pickerModal");
+  const startMuscle = selectedMuscle;
+  let query = "";
+  let muscleFilter = startMuscle || null;
 
-  const filtered = () => {
-    const nn = normalize(q);
+  function filtered(){
+    const q = norm(query);
     return EXERCISES.filter(ex =>
       (muscleFilter==null || ex.muscle===muscleFilter) &&
       ex.environment.includes(Filters.environment) &&
-      ex.equipment.every(eq=>Filters.allowedEquipment.has(eq)) &&
+      ex.equipment.every(e => Filters.allowedEquipment.has(e)) &&
       (Filters.preferBeginner ? ex.beginnerFriendly : true) &&
-      (nn==="" ? true : (normalize(ex.name).includes(nn) || normalize(ex.instructions||"").includes(nn) || normalize(mTitle(ex.muscle)).includes(nn) || normalize(ex.variant||"").includes(nn)))
+      (q==="" ? true : (
+        norm(ex.name).includes(q) ||
+        norm(ex.instructions).includes(q) ||
+        norm(mTitle(ex.muscle)).includes(q) ||
+        norm(ex.variant).includes(q)
+      ))
     ).sort((a,b)=> a.name.localeCompare(b.name));
-  };
+  }
 
-  function refresh(){
-    const chips = `<button class="chip ${muscleFilter==null?"active":""}" data-mus="">${t("all")}</button>` +
-      Muscles.map(m=>`<button class="chip ${muscleFilter===m?"active":""}" data-mus="${m}">${mTitle(m)}</button>`).join("");
-
-    const rows = filtered().map(ex=>`
+  function renderPicker(){
+    const chipsMuscles = `<button class="chip ${muscleFilter==null?"active":""}" data-muscle="">${t('all')}</button>` +
+      Muscles.map(m=>`<button class="chip ${muscleFilter===m?"active":""}" data-muscle="${m}">${mTitle(m)}</button>`).join('');
+    const items = filtered().map(ex=>`
       <tr>
-        <td><strong>${ex.name}</strong><div class="caption">${ex.instructions||""}</div></td>
-        <td class="caption">${mTitle(ex.muscle)}<br>${ex.equipment.map(eTitle).join(", ")}</td>
-        <td style="text-align:right"><button class="btn small primary" data-add="${ex.id}">＋</button></td>
-      </tr>`).join("");
+        <td><strong>${ex.name}</strong><div class="caption">${ex.instructions}</div></td>
+        <td class="small">${mTitle(ex.muscle)}<br><span class="caption">${ex.equipment.map(equipTitle).join(", ")}</span></td>
+        <td style="text-align:right"><button class="btn primary small" data-add="${ex.id}">＋</button></td>
+      </tr>`).join('');
 
-    el.innerHTML = `
-      <div class="header">
-        <h3>＋ ${t("addExercise")}</h3>
-        <div class="row" style="gap:6px">
-          <button class="btn small" id="mkCustom">＋ ${t("createExercise")}</button>
-          <button class="btn small" id="p_close">✖️ ${t("close")}</button>
+    m.innerHTML = `
+      <div class="sticky">
+        <h3 style="margin:0">${t('addExercise')}</h3>
+        <div class="grid cols2" style="margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span>🔎</span>
+            <input id="q" placeholder="${t('searchExercises')}" autocomplete="off">
+          </div>
+          <div style="text-align:right">
+            <button class="btn secondary small" id="mkCustom">＋ ${t('createExercise')}</button>
+            <button class="btn secondary small" id="closePicker">✖️ ${t('close')}</button>
+          </div>
         </div>
+        <div class="chips" id="chips">${chipsMuscles}</div>
       </div>
-      <div class="row" style="gap:8px; margin:8px 0 6px">
-        <span>🔎</span><input class="input" id="q" placeholder="${t("searchExercises")}" autocomplete="off">
-      </div>
-      <div class="chips" id="chips">${chips}</div>
-      <table class="table">${rows}</table>
+      <table class="table">${items}</table>
     `;
 
-    el.querySelector("#q").value = q;
-    setTimeout(()=> el.querySelector("#q").focus(), 10);
-    el.querySelector("#q").oninput = e => { q = e.target.value; refresh(); };
-    el.querySelector("#p_close").onclick = closeSheets;
-    el.querySelector("#mkCustom").onclick = ()=> openNewExerciseForm(()=>{ loadExercises().then(refresh); });
+    m.querySelector('#q').value = query;
+    setTimeout(()=>m.querySelector('#q').focus(), 50);
+    m.querySelector('#q').oninput = e => { query = e.target.value; renderPicker(); };
+    m.querySelector('#closePicker').onclick = closeModals;
+    m.querySelector('#mkCustom').onclick = () => openNewExerciseForm(()=>{ EXERCISES = builtInLibrary().concat(CustomStore.list()); renderPicker(); });
 
-    el.querySelectorAll("[data-mus]").forEach(b=> b.onclick = ()=>{ const v=b.dataset.mus; muscleFilter = v?v:null; refresh(); });
-    el.querySelectorAll("[data-add]").forEach(b => b.onclick = ()=>{
-      const ex = filtered().find(e=>e.id===b.dataset.add); if(!ex) return;
-      openConfig(ex, (sets,min,max,rest)=>{
-        currentPlan.items.push({ id:makeId(), exercise:ex, sets, reps:[min,max], restSeconds:rest, notes: ex.unilateral ? (LANG==="es"?"Trabaja ambos lados. RPE 7–8.":"Work both sides. RPE 7–8.") : (LANG==="es"?"RPE 7–8.":"RPE 7–8.") });
-        closeSheets(); render();
+    m.querySelectorAll('[data-muscle]').forEach(b => b.onclick = () => { const v=b.dataset.muscle; muscleFilter = v? v : null; renderPicker(); });
+    m.querySelectorAll('[data-add]').forEach(btn => btn.onclick = () => {
+      const ex = filtered().find(e=>e.id===btn.dataset.add); if(!ex) return;
+      openConfig(ex, (sets,repsMin,repsMax,rest)=>{
+        currentPlan.items.push({ id:makeId(), exercise:ex, sets, reps:[repsMin,repsMax], restSeconds:rest,
+          notes: ex.unilateral ? (Lang.get()==="es"?"Trabaja ambos lados. RPE 7–8.":"Work both sides. RPE 7–8.") : (Lang.get()==="es"?"RPE 7–8.":"RPE 7–8.") });
+        closeModals(); renderAll();
       });
     });
   }
-  refresh();
-  openSheet(el);
+  renderPicker();
+  showModal('pickerModal');
 }
 
-/* Config sheet (sets/reps/rest) */
+/* ===================== Config (sets/reps/rest) ===================== */
 function openConfig(ex, onAdd){
-  const el = $("#configModal");
+  const m = $("#configModal");
   const sets = TrainingDefaults.sets(Filters.goal, Filters.minutes);
   const [rmin,rmax] = TrainingDefaults.repRange(Filters.goal);
   const rest = TrainingDefaults.rest(Filters.goal);
-
-  el.innerHTML = `
-    <div class="header"><h3>⚙️ ${t("setsRepsRest")}</h3><button class="btn small" id="c_close">✖️ ${t("close")}</button></div>
-    <div class="card" style="margin:10px 0">
-      <strong>${ex.name}</strong><div class="caption">${ex.instructions||""}</div>
+  m.innerHTML = `
+    <div class="sticky"><h3 style="margin:0">${t('addExercise')}</h3></div>
+    <div class="group"><strong>${ex.name}</strong><div class="caption">${ex.instructions}</div></div>
+    <div class="grid cols3">
+      <div><label>${Lang.get()==="es"?"Series":"Sets"}</label><input type="number" id="cfg_sets" min="1" max="10" value="${sets}"></div>
+      <div><label>${Lang.get()==="es"?"Reps mín":"Min reps"}</label><input type="number" id="cfg_min" min="1" max="30" value="${rmin}"></div>
+      <div><label>${Lang.get()==="es"?"Reps máx":"Max reps"}</label><input type="number" id="cfg_max" min="${rmin}" max="30" value="${rmax}"></div>
     </div>
-    <div class="grid cols-3">
-      <div><label>${LANG==="es"?"Series":"Sets"}</label><input class="input" type="number" id="cfg_sets" min="1" max="10" value="${sets}"></div>
-      <div><label>${LANG==="es"?"Reps mín":"Min reps"}</label><input class="input" type="number" id="cfg_min" min="1" max="30" value="${rmin}"></div>
-      <div><label>${LANG==="es"?"Reps máx":"Max reps"}</label><input class="input" type="number" id="cfg_max" min="${rmin}" max="30" value="${rmax}"></div>
-    </div>
-    <div style="margin:10px 0"><label>${t("rest")} (s)</label><input class="input" type="number" id="cfg_rest" min="15" max="300" step="15" value="${rest}"></div>
-    <div class="grid cols-2">
-      <button class="btn ghost" id="cfg_cancel">✖️ ${t("cancel")}</button>
-      <button class="btn primary" id="cfg_save">💾 ${t("save")}</button>
+    <div class="group"><label>${t('rest')} (s)</label><input type="number" id="cfg_rest" min="15" max="300" step="15" value="${rest}"></div>
+    <div class="grid cols2">
+      <button class="btn secondary" id="cfg_cancel">✖️ ${t('cancel')}</button>
+      <button class="btn primary" id="cfg_save">💾 ${t('save')}</button>
     </div>
   `;
-  el.querySelector("#c_close").onclick = closeSheets;
-  el.querySelector("#cfg_cancel").onclick = closeSheets;
-  el.querySelector("#cfg_save").onclick = ()=>{
-    const s = clamp(parseInt(el.querySelector("#cfg_sets").value||sets),1,10);
-    const min = clamp(parseInt(el.querySelector("#cfg_min").value||rmin),1,30);
-    const max = Math.max(min, clamp(parseInt(el.querySelector("#cfg_max").value||rmax),1,30));
-    const r = clamp(parseInt(el.querySelector("#cfg_rest").value||rest),15,600);
+  m.querySelector('#cfg_cancel').onclick = closeModals;
+  m.querySelector('#cfg_save').onclick = () => {
+    const s = Math.max(1,Math.min(10,parseInt(m.querySelector('#cfg_sets').value||sets)));
+    const min = Math.max(1,parseInt(m.querySelector('#cfg_min').value||rmin));
+    const max = Math.max(min,parseInt(m.querySelector('#cfg_max').value||rmax));
+    const r = Math.max(15,parseInt(m.querySelector('#cfg_rest').value||rest));
     onAdd(s,min,max,r);
   };
-  openSheet(el);
+  showModal('configModal');
 }
 
-/* New custom exercise (saved to localStorage) */
+/* ===================== New custom exercise ===================== */
 function openNewExerciseForm(onDone){
-  const el = $("#pickerModal");
-  const eq = Object.values(Equip).map(e=>`<label><input type="checkbox" data-eq="${e}"> ${eTitle(e)}</label>`).join("");
-  const pat = Object.values(Pattern).map(p=>`<label><input type="checkbox" data-p="${p}"> ${pTitle(p)}</label>`).join("");
-  const env = [Env.home,Env.gym].map(e=>`<label><input type="checkbox" data-env="${e}" checked> ${t(e)}</label>`).join("");
+  const m = $("#pickerModal"); // reutilizamos para mantener foco
+  const eqOpts = Object.values(Equip).map(e=>`<label><input type="checkbox" data-eq="${e}"> ${equipTitle(e)}</label>`).join('<br>');
+  const envOpts = [Env.home,Env.gym].map(e=>`<label><input type="checkbox" data-env="${e}" checked> ${t(e)}</label>`).join('<br>');
+  const patOpts = Object.values(Pattern).map(p=>`<label><input type="checkbox" data-p="${p}"> ${p}</label>`).join('<br>');
 
-  el.innerHTML = `
-    <div class="header"><h3>＋ ${t("createExercise")}</h3><button class="btn small" id="n_close">✖️ ${t("close")}</button></div>
-    <div class="grid cols-2">
-      <div><label>${t("name")}</label><input class="input" id="nx_name"></div>
-      <div><label>${t("muscle")||"Músculo"}</label>
-        <select class="input" id="nx_muscle">${Muscles.map(m=>`<option value="${m}">${mTitle(m)}</option>`).join("")}</select>
+  m.innerHTML = `
+    <div class="sticky"><h3 style="margin:0">${t('createExercise')}</h3></div>
+    <div class="grid cols2">
+      <div><label>${t('name')}</label><input id="nx_name" placeholder="${t('name')}"></div>
+      <div><label>${t('muscle')}</label>
+        <select id="nx_muscle">${Muscles.map(m=>`<option value="${m}">${mTitle(m)}</option>`).join('')}</select>
       </div>
     </div>
-    <div style="margin-top:8px"><label>${t("patterns")}</label><div class="grid cols-3">${pat}</div></div>
-    <div style="margin-top:8px"><label>${t("equipment")}</label><div class="grid cols-3">${eq}</div></div>
-    <div style="margin-top:8px"><label>${t("environment")}</label><div class="grid cols-2">${env}</div></div>
-    <div class="grid cols-2" style="margin:10px 0">
-      <label><input type="checkbox" id="nx_uni"> ${t("unilateralQ")}</label>
-      <label><input type="checkbox" id="nx_beg" checked> ${t("beginnerQ")}</label>
+    <div class="group"><label>${t('patterns')}</label><div class="grid">${patOpts}</div></div>
+    <div class="group"><label>${t('equipment')}</label><div class="grid">${eqOpts}</div></div>
+    <div class="group"><label>${t('environment')}</label><div class="grid">${envOpts}</div></div>
+    <div class="grid cols2">
+      <label><input type="checkbox" id="nx_uni"> ${t('unilateralQ')}</label>
+      <label><input type="checkbox" id="nx_beg" checked> ${t('beginnerQ')}</label>
     </div>
-    <div><label>${t("instructions")}</label><textarea class="input" id="nx_ins" rows="3"></textarea></div>
-    <div><label>${t("mediaURL")}</label><input class="input" id="nx_media" placeholder="https://..."></div>
-    <div class="grid cols-2" style="margin-top:10px">
-      <button class="btn ghost" id="nx_cancel">✖️ ${t("cancel")}</button>
-      <button class="btn primary" id="nx_save">💾 ${t("save")}</button>
+    <div class="group"><label>${t('instructions')}</label><textarea id="nx_ins" rows="3"></textarea></div>
+    <div class="group"><label>${t('mediaURL')}</label><input id="nx_media" placeholder="https://..."></div>
+    <div class="grid cols2">
+      <button class="btn secondary" id="nx_cancel">✖️ ${t('cancel')}</button>
+      <button class="btn primary" id="nx_save">💾 ${t('save')}</button>
     </div>
-    <p class="caption">${t("custom")}</p>
+    <div class="footer-note">${t('custom')}</div>
   `;
-  el.querySelector("#n_close").onclick = openPicker;
-  el.querySelector("#nx_cancel").onclick = openPicker;
-  el.querySelector("#nx_save").onclick = ()=>{
-    const name = (el.querySelector("#nx_name").value||"").trim() || (LANG==="es"?"Ejercicio sin nombre":"Untitled exercise");
-    const muscle = el.querySelector("#nx_muscle").value;
-    const pats = [...el.querySelectorAll("[data-p]")].filter(i=>i.checked).map(i=>i.dataset.p);
-    const eq   = [...el.querySelectorAll("[data-eq]")].filter(i=>i.checked).map(i=>i.dataset.eq);
-    const envs = [...el.querySelectorAll("[data-env]")].filter(i=>i.checked).map(i=>i.dataset.env);
-    const unilateral = el.querySelector("#nx_uni").checked;
-    const beginner = el.querySelector("#nx_beg").checked;
-    const instructions = (el.querySelector("#nx_ins").value||"").trim() || (LANG==="es"?"Ejercicio personalizado.":"Custom exercise.");
-    const mediaURL = (el.querySelector("#nx_media").value||"").trim() || null;
-    const ex = { id:makeId(), name, muscle, patterns: (pats.length?pats:["hipHinge"]), equipment: (eq.length?eq:[Equip.bodyweight]), environment: (envs.length?envs:[Env.home,Env.gym]), unilateral, beginnerFriendly: beginner, instructions, variant:`custom_${muscle}`, mediaURL };
-    const arr = Store.get(CustomKey, []); arr.unshift(ex); Store.set(CustomKey, arr);
+  m.querySelector('#nx_cancel').onclick = openPicker;
+  setTimeout(()=>m.querySelector('#nx_name').focus(),50);
+  m.querySelector('#nx_save').onclick = () => {
+    const name = (m.querySelector('#nx_name').value||"").trim() || (Lang.get()==="es"?"Ejercicio sin nombre":"Untitled exercise");
+    const muscle = m.querySelector('#nx_muscle').value;
+    const pats=[...m.querySelectorAll('[data-p]')].filter(i=>i.checked).map(i=>i.dataset.p);
+    const eq=[...m.querySelectorAll('[data-eq]')].filter(i=>i.checked).map(i=>i.dataset.eq);
+    const env=[...m.querySelectorAll('[data-env]')].filter(i=>i.checked).map(i=>i.dataset.env);
+    const unilateral = m.querySelector('#nx_uni').checked;
+    const beginner = m.querySelector('#nx_beg').checked;
+    const instructions = (m.querySelector('#nx_ins').value||"").trim() || (Lang.get()==="es"?"Ejercicio personalizado.":"Custom exercise.");
+    const mediaURL = (m.querySelector('#nx_media').value||"").trim() || null;
+    const ex = { id:makeId(), name, muscle, patterns: pats.length?pats:["hipHinge"], equipment: eq.length?eq:[Equip.bodyweight], environment: env.length?env:[Env.home,Env.gym], unilateral, beginnerFriendly: beginner, instructions, variant:`custom_${muscle}`, mediaURL };
+    CustomStore.add(ex);
     if(typeof onDone==="function") onDone(ex);
-    toast(LANG==="es"?"Guardado":"Saved");
   };
 }
 
-/* Favorites sheet */
+/* ===================== Favorites ===================== */
 function openFavorites(){
-  const el = $("#favoritesModal");
-  const list = Store.get(FavKey, []);
-  el.innerHTML = `
-    <div class="header"><h3>❤️ ${t("favorites")}</h3><button class="btn small" id="fav_close">✖️ ${t("close")}</button></div>
-    ${!list.length? `<div class="caption" style="padding:10px">${LANG==="es"?"Aún no hay favoritos.":"No favorites yet."}</div>`: ""}
-    ${list.map((p,i)=>`
-      <div class="card">
-        <div class="row">
-          <div>
-            <div class="item-title">${p.muscle?mTitle(p.muscle):t("fullBody")}</div>
-            <div class="caption">${t(p.goal)} • ${p.durationMinutes} ${t("minutes").toLowerCase()}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn small primary" data-use="${i}">✔ ${t("use")}</button>
-            <button class="btn small" data-del="${i}">🗑️</button>
+  const m = $("#favoritesModal");
+  const list = Favorites.list();
+  m.innerHTML = `
+    <div class="sticky"><h3 style="margin:0">${t('favorites')}</h3></div>
+    ${!list.length? `<div class="caption" style="padding:10px">${Lang.get()==="es"?"Aún no hay favoritos.":"No favorites yet."}</div>`: ""}
+    <div>
+      ${list.map((p,i)=>`
+        <div class="card">
+          <div class="row">
+            <div>
+              <div style="font-weight:700">${p.muscle?mTitle(p.muscle):t('fullBody')}</div>
+              <div class="caption">${t(p.goal)} • ${p.durationMinutes} ${t('minutes').toLowerCase()}</div>
+            </div>
+            <div class="row-right">
+              <button class="btn primary small" data-use="${i}">✔ ${t('use')}</button>
+              <button class="btn secondary small" data-del="${i}">🗑️</button>
+            </div>
           </div>
         </div>
-      </div>
-    `).join("")}
-    <div><button class="btn ghost" id="closeFav">✖️ ${t("close")}</button></div>
+      `).join('')}
+    </div>
+    <div><button class="btn secondary" id="favClose">✖️ ${t('close')}</button></div>
   `;
-  el.querySelector("#fav_close").onclick = closeSheets;
-  el.querySelector("#closeFav").onclick = closeSheets;
-  el.querySelectorAll("[data-use]").forEach(b => b.onclick = ()=>{
-    const idx = parseInt(b.dataset.use,10);
-    const plan = Store.get(FavKey, [])[idx];
-    currentPlan = plan; closeSheets(); render();
+  m.querySelector('#favClose').onclick = closeModals;
+  m.querySelectorAll('[data-use]').forEach(b => b.onclick = () => {
+    const plan = Favorites.list()[parseInt(b.dataset.use,10)];
+    currentPlan = plan; closeModals(); renderAll();
   });
-  el.querySelectorAll("[data-del]").forEach(b => b.onclick = ()=>{
-    const idx = parseInt(b.dataset.del,10);
-    const arr = Store.get(FavKey, []); arr.splice(idx,1); Store.set(FavKey, arr); openFavorites();
+  m.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    Favorites.removeAt(parseInt(b.dataset.del,10)); openFavorites();
   });
-  openSheet(el);
+  showModal('favoritesModal');
 }
 
-/* Settings sheet */
+/* ===================== Settings ===================== */
 function openSettings(){
-  const el = $("#settingsModal");
-  const cur = localStorage.getItem(LangKey) || "es";
-  el.innerHTML = `
-    <div class="header"><h3>⚙️ ${t("settings")}</h3><button class="btn small" id="s_close">✖️ ${t("close")}</button></div>
-    <div style="margin:10px 0">
-      <label>${t("language")}</label>
-      <select class="input" id="s_lang">
-        <option value="system">${t("systemLang")}</option>
+  const m = $("#settingsModal");
+  const cur = localStorage.getItem(Lang.key)||"es";
+  m.innerHTML = `
+    <div class="sticky"><h3 style="margin:0">${t('settings')}</h3></div>
+    <div class="group">
+      <label>${t('language')}</label>
+      <select id="s_lang">
+        <option value="system">${t('systemLang')}</option>
         <option value="es">Español</option>
         <option value="en">English</option>
       </select>
     </div>
-    <p class="caption">SinGym © 2025 — LocalStorage, sin cuentas.</p>
+    <div class="group">
+      <label>${t('feedback')}</label>
+      <div><a href="mailto:paul_rios@engineer.com?subject=%5BApp%20Feedback%5D">✉️ Email</a></div>
+    </div>
+    <div class="group">
+      <label>${t('supportDev')}</label>
+      <div class="caption">${t('tipJar')} — ${Lang.get()==="es"?"(en web es informativo)":"(informational on web)"}.</div>
+    </div>
+    <div><button class="btn secondary" id="s_close">✖️ ${t('close')}</button></div>
   `;
-  el.querySelector("#s_lang").value = cur;
-  el.querySelector("#s_close").onclick = closeSheets;
-  el.querySelector("#s_lang").onchange = (e)=>{
-    localStorage.setItem(LangKey, e.target.value);
-    LANG = getLang();
+  m.querySelector('#s_lang').value = cur;
+  m.querySelector('#s_close').onclick = closeModals;
+  m.querySelector('#s_lang').onchange = e => {
+    Lang.set(e.target.value);
+    EXERCISES = builtInLibrary().concat(CustomStore.list());
     renderAll();
   };
-  openSheet(el);
+  showModal('settingsModal');
 }
 
-/* Helpers */
-function el(html){ const t=document.createElement("template"); t.innerHTML=html.trim(); return t.content.firstElementChild; }
-function normalize(s){ return (s||"").toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); }
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
-/* Buttons */
+/* ===================== Events & Boot ===================== */
 $("#openFilters").onclick = openFilters;
 $("#btnFilters").onclick = openFilters;
 $("#btnFavorites").onclick = openFavorites;
 $("#btnSettings").onclick = openSettings;
 $("#generate").onclick = generate;
 
-/* Save favs */
-document.addEventListener("click",(e)=>{
-  if(e.target && e.target.id==="saveFav"){ const arr = Store.get(FavKey, []); arr.unshift(currentPlan); Store.set(FavKey, arr); toast(`${t("saved")} ✅`); }
-  if(e.target && e.target.id==="addEx"){ openPicker(); }
-  if(e.target && e.target.id==="clearPlan"){ currentPlan=null; render(); }
-});
-
-/* Render all */
-function renderAll(){ renderHeader(); renderMuscleChips(); $("#generate").disabled = (!Filters.fullBody && !selectedMuscle); renderContent(); }
-
-/* Boot */
-(async function(){
-  renderHeader(); renderMuscleChips();
-  await loadExercises();
+async function boot(){
+  EXERCISES = await loadExercises();
   renderAll();
-})();
+}
+boot();
