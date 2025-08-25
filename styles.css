@@ -45,14 +45,15 @@ body{
 /* Layout */
 .container{ max-width:980px; margin:0 auto; padding:16px clamp(12px,4vw,24px) 60px; }
 
-/* Muscles grid */
+/* Muscles grid (sin scroll horizontal) */
 .muscle-grid{
   display:grid; gap:10px;
   grid-template-columns: repeat(5, minmax(0,1fr));
 }
 @media (max-width:980px){ .muscle-grid{ grid-template-columns: repeat(4,1fr); } }
 @media (max-width:720px){ .muscle-grid{ grid-template-columns: repeat(3,1fr); } }
-@media (max-width:420px){ .muscle-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width:430px){ .muscle-grid{ grid-template-columns: repeat(2,1fr); } }
+
 .muscle{
   display:flex; align-items:center; justify-content:center; text-align:center;
   padding:10px 8px; border-radius:999px; border:1px solid transparent;
@@ -85,10 +86,6 @@ body{
 .caption{ color:var(--muted); font-size:12px; }
 .h-strong{ font-weight:800; font-size:16px; }
 
-/* Tiny badges/buttons */
-.badge{ font-size:11px; padding:4px 6px; border-radius:8px; background:var(--glass); color:var(--muted); }
-.btn.sm{ padding:8px 10px; border-radius:12px; font-weight:600; }
-
 /* Timer */
 .timer{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .timer .time{
@@ -97,7 +94,7 @@ body{
   cursor:pointer;
 }
 
-/* Modal (bottom-sheet style on mobile) */
+/* Modal (bottom-sheet style) */
 .overlay{
   position:fixed; inset:0; background:rgba(0,0,0,.45); backdrop-filter: blur(2px);
 }
@@ -129,7 +126,7 @@ body{
   display:grid; place-items:center; min-height:40vh; color:var(--muted); text-align:center;
 }
 
-/* iOS safe area for bottom sheet spacing */
+/* iOS safe area */
 @supports (padding: max(0px)) {
   .modal{ padding-bottom: max(14px, env(safe-area-inset-bottom)); }
 }
