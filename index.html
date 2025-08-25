@@ -1,70 +1,59 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0b0c0d">
-  <title>SinGym — Rutinas en casa</title>
-  <link rel="stylesheet" href="styles.css?v=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>SinGym — Rutinas en casa</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="preload" href="exercises.json" as="fetch" type="application/json" crossorigin="anonymous">
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <div class="brand">
-        <div class="logo">🏋️‍♂️</div>
-        <div>
-          <h1 id="appTitle">Rutinas en casa</h1>
-          <p class="muted" id="subtitle">Elige un músculo o activa Cuerpo completo y presiona Generar.</p>
-        </div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🏋️‍♀️</div>
+      <div class="titles">
+        <h1 id="appTitle">Rutinas en casa</h1>
+        <p id="subtitle" class="muted">Elige un músculo o activa Cuerpo completo y presiona Generar.</p>
       </div>
-      <nav class="actions">
-        <button class="icon-btn" id="btnFavorites" aria-label="Favoritos" title="Favoritos">
-          <span class="ico">❤️</span><span class="hide-sm" data-i="favorites">Favoritos</span>
-        </button>
-        <button class="icon-btn" id="btnFilters" aria-label="Filtros" title="Filtros">
-          <span class="ico">🎚️</span><span class="hide-sm" data-i="filters">Filtros</span>
-        </button>
-        <button class="icon-btn" id="btnSettings" aria-label="Ajustes" title="Ajustes">
-          <span class="ico">⚙️</span><span class="hide-sm" data-i="settings">Ajustes</span>
-        </button>
-      </nav>
-    </header>
+    </div>
+    <nav class="actions">
+      <button class="icon" id="btnFavorites" title="Favoritos" aria-label="Favoritos">
+        <span>❤️</span>
+      </button>
+      <button class="icon" id="btnFilters" title="Filtros" aria-label="Filtros">
+        <span>🎚️</span>
+      </button>
+      <button class="icon" id="btnSettings" title="Ajustes" aria-label="Ajustes">
+        <span>⚙️</span>
+      </button>
+    </nav>
+  </header>
 
-    <main class="container">
-      <section class="chips" id="muscleChips"></section>
+  <main class="container">
+    <section class="chips" id="muscleChips"></section>
 
-      <section class="controls">
-        <button class="btn ghost" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
-        <button class="btn primary" id="generate">⚡ <span data-i="generate">Generar</span></button>
-      </section>
+    <div class="controls">
+      <button class="btn ghost" id="openFilters">🎚️ Filtros</button>
+      <button class="btn primary" id="generate">⚡ Generar</button>
+    </div>
 
-      <section id="content"></section>
-    </main>
-
-    <footer class="foot muted">
-      SinGym © 2025 — LocalStorage, sin cuentas.
-    </footer>
-  </div>
+    <section id="content"></section>
+  </main>
 
   <!-- Backdrop -->
-  <div class="backdrop" id="backdrop"></div>
+  <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Modals / Sheets -->
-  <div class="sheet" id="filtersModal" role="dialog" aria-modal="true"></div>
-  <div class="sheet" id="pickerModal" role="dialog" aria-modal="true"></div>
-  <div class="sheet" id="favoritesModal" role="dialog" aria-modal="true"></div>
-  <div class="sheet" id="settingsModal" role="dialog" aria-modal="true"></div>
-  <div class="sheet" id="configModal" role="dialog" aria-modal="true"></div>
-  <div class="lightbox" id="gifLightbox" aria-modal="true" role="dialog">
-    <div class="lightbox-inner">
-      <button class="close-x" id="gifClose" aria-label="Cerrar">✖</button>
-      <iframe id="gifFrame" title="GIF" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
-      <div class="lightbox-fallback muted" id="gifFallback"></div>
-    </div>
-  </div>
+  <!-- Bottom sheets / modals -->
+  <aside id="filtersModal" class="sheet" hidden></aside>
+  <aside id="pickerModal" class="sheet" hidden></aside>
+  <aside id="favoritesModal" class="sheet" hidden></aside>
+  <aside id="settingsModal" class="sheet" hidden></aside>
+  <aside id="configModal" class="sheet" hidden></aside>
 
-  <script defer src="app.js?v=1.0"></script>
+  <!-- Toast -->
+  <div id="toast" class="toast" hidden></div>
+
+  <script defer src="app.js"></script>
 </body>
 </html>
