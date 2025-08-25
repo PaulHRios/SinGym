@@ -1,9 +1,5 @@
-// ejercicios.js
-// Base de datos de ejercicios (puedes crecerla libremente).
-// Formato de cada ejercicio:
-// { name, muscle, patterns:[], equipment:[], environment:['home'|'gym'], unilateral:bool, beginnerFriendly:bool, instructions, variant, mediaURL? }
-
-export const EXERCISES = [
+// ejercicios.js (global, sin módulos)
+window.EXERCISES = [
   /* ===== PECHO ===== */
   { name:"Flexiones", muscle:"chest", patterns:["horizontalPush"], equipment:["bodyweight"], environment:["home","gym"], unilateral:false, beginnerFriendly:true, instructions:"Manos bajo hombros, cuerpo en línea.", variant:"chest_pushup" },
   { name:"Flexiones inclinadas", muscle:"chest", patterns:["horizontalPush"], equipment:["bodyweight","bench"], environment:["home","gym"], unilateral:false, beginnerFriendly:true, instructions:"Manos elevadas; versión más fácil.", variant:"chest_incline" },
@@ -64,6 +60,4 @@ export const EXERCISES = [
   { name:"Elevación de talones (de pie)", muscle:"calves", patterns:["calfRaise"], equipment:["bodyweight"], environment:["home","gym"], unilateral:false, beginnerFriendly:true, instructions:"Pausa 1s arriba; controla bajada.", variant:"calves_standing" },
   { name:"Elevación de talón unilateral", muscle:"calves", patterns:["calfRaise"], equipment:["bodyweight"], environment:["home","gym"], unilateral:true, beginnerFriendly:true, instructions:"Busca equilibrio; rango completo.", variant:"calves_single" },
 ];
-
-// Sugerencia: agrega mediaURL (gif/mp4 embebible) si la tienes:
-// { ..., mediaURL:"https://tu-gif-o-video.mp4" }
+// Puedes añadir mediaURL: "...mp4/.gif" para que se abra en el modal interno.
