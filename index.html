@@ -3,57 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>SinGym — Rutinas en casa</title>
-<link rel="stylesheet" href="styles.css">
-<link rel="preload" href="exercises.json" as="fetch" type="application/json" crossorigin="anonymous">
+<title>Rutinas en casa • Web</title>
+
+<!-- CSS (tu mismo styles.css; agregamos ?v=3 para forzar actualización en Safari) -->
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">🏋️‍♀️</div>
-      <div class="titles">
-        <h1 id="appTitle">Rutinas en casa</h1>
-        <p id="subtitle" class="muted">Elige un músculo o activa Cuerpo completo y presiona Generar.</p>
-      </div>
+<div class="container">
+  <div class="header">
+    <div>
+      <div class="h1" id="appTitle">Rutinas en casa</div>
+      <div class="sub" id="subtitle"></div>
     </div>
-    <nav class="actions">
-      <button class="icon" id="btnFavorites" title="Favoritos" aria-label="Favoritos">
-        <span>❤️</span>
-      </button>
-      <button class="icon" id="btnFilters" title="Filtros" aria-label="Filtros">
-        <span>🎚️</span>
-      </button>
-      <button class="icon" id="btnSettings" title="Ajustes" aria-label="Ajustes">
-        <span>⚙️</span>
-      </button>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="chips" id="muscleChips"></section>
-
-    <div class="controls">
-      <button class="btn ghost" id="openFilters">🎚️ Filtros</button>
-      <button class="btn primary" id="generate">⚡ Generar</button>
+    <div class="toolbar">
+      <button id="btnFavorites">❤️ <span data-i="favorites">Favoritos</span></button>
+      <button id="btnFilters">🎚️ <span data-i="filters">Filtros</span></button>
+      <button id="btnSettings">⚙️ <span data-i="settings">Ajustes</span></button>
+      <a id="publishLink" href="https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site" target="_blank" rel="noopener" style="display:none">Publicar</a>
     </div>
+  </div>
 
-    <section id="content"></section>
-  </main>
+  <div class="chips" id="muscleChips"></div>
 
-  <!-- Backdrop -->
-  <div id="backdrop" class="backdrop" hidden></div>
+  <div class="controls">
+    <button class="btn secondary" id="openFilters">🎚️ <span data-i="filters">Filtros</span></button>
+    <button class="btn primary" id="generate" disabled>⚡ <span data-i="generate">Generar</span></button>
+  </div>
 
-  <!-- Bottom sheets / modals -->
-  <aside id="filtersModal" class="sheet" hidden></aside>
-  <aside id="pickerModal" class="sheet" hidden></aside>
-  <aside id="favoritesModal" class="sheet" hidden></aside>
-  <aside id="settingsModal" class="sheet" hidden></aside>
-  <aside id="configModal" class="sheet" hidden></aside>
+  <div id="content"></div>
+</div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast" hidden></div>
+<!-- Modals -->
+<div class="modal-back" id="backdrop"></div>
+<div class="modal" id="filtersModal"></div>
+<div class="modal" id="pickerModal"></div>
+<div class="modal" id="favoritesModal"></div>
+<div class="modal" id="settingsModal"></div>
+<div class="modal" id="configModal"></div>
 
-  <script defer src="app.js"></script>
+<!-- JS (agregamos ?v=3 para cache-bust) -->
+<script defer src="app.js?v=3"></script>
 </body>
 </html>
